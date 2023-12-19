@@ -18,14 +18,14 @@
   
     <meta name="description" content="论文解读——Attention is all you need（理解transformer原理及实现）neurips2017 论文地址 基于tensorflow2.x的实现  摘要：本篇论文是由goole Brain在2017年发表的一篇论文，提出了一个广泛应用于自然语言处理任务的新模型，即Transformer。主要贡献 ： 1.Transformer是开创性的工作，引领了后来深度学习的发展，截">
 <meta property="og:type" content="article">
-<meta property="og:title" content="page">
+<meta property="og:title" content="论文解读——Attention is all you need（理解transformer原理及实现）">
 <meta property="og:url" content="https://jiawei804.github.io/blog/2023/12/19/2023/12/19/transformer/index.html">
 <meta property="og:site_name" content="Jiawei&#39;s Blog">
 <meta property="og:description" content="论文解读——Attention is all you need（理解transformer原理及实现）neurips2017 论文地址 基于tensorflow2.x的实现  摘要：本篇论文是由goole Brain在2017年发表的一篇论文，提出了一个广泛应用于自然语言处理任务的新模型，即Transformer。主要贡献 ： 1.Transformer是开创性的工作，引领了后来深度学习的发展，截">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://jiawei804.github.io/blog/images/2023/12-19.jpg">
 <meta property="article:published_time" content="2023-12-18T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-12-19T13:14:46.783Z">
+<meta property="article:modified_time" content="2023-12-19T13:20:14.130Z">
 <meta property="article:author" content="Zhang Jiawei">
 <meta property="article:tag" content="DeepLearning">
 <meta name="twitter:card" content="summary_large_image">
@@ -33,7 +33,7 @@
   
   
   
-  <title>page - Jiawei&#39;s Blog</title>
+  <title>论文解读——Attention is all you need（理解transformer原理及实现） - Jiawei&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -211,7 +211,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="page"></span>
+            <span id="subtitle" data-typed-text="论文解读——Attention is all you need（理解transformer原理及实现）"></span>
           
         </div>
 
@@ -282,7 +282,7 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">page</h1>
+            <h1 id="seo-header">论文解读——Attention is all you need（理解transformer原理及实现）</h1>
             
             
               <div class="markdown-body">
@@ -297,33 +297,45 @@
 <p>3.提出的自注意力机制（self-Attention）被广泛应用于其他网络，推动了深度学习的发展，是后来BERT、GPT等模型的基础。</p>
 </blockquote>
 <h2 id="Transformer究竟长什么样子？"><a href="#Transformer究竟长什么样子？" class="headerlink" title="Transformer究竟长什么样子？"></a>Transformer究竟长什么样子？</h2><p>话不多说，先上图。</p>
-<p><img src="/blog/./transformer/1.jpg" srcset="/blog/img/loading.gif" lazyload></p>
+<div class="row justify-content-sm-center">
+    <div class="col mt-3 mt-md-0">
+        <img src="/blog/2023/12/19/2023/12/19/transformer/1.jpg" srcset="/blog/img/loading.gif" lazyload class="">
+    </div>
+</div>
+
+
 <p>先从宏观上介绍，Transformer一共有两部分组成，第一部分是编码器Encoder（左），第二部分是解码器Decoder（右）。位置编码（Positional Encoding）来记录位置信息，Input Embedding、Output Embedding将输入向量转化为Embedding嵌入，然后将二者加起来喂入模型，Decoder最终的输出会通过全连接层和SoftMax得到词表的概率分布，最简单的方式是选出概率最高的词作为候选词。接下来来详细聊一聊内部的设计。</p>
 <h2 id="编码器Encoder"><a href="#编码器Encoder" class="headerlink" title="编码器Encoder"></a>编码器Encoder</h2><p>我们从Inputs一步一步梳理。</p>
 <p>假设我们的训练集只有一句文本，首先要通过分词器tokenizer转变成词id，tokenizer有三种划分方式：分别是char-level、word-level、sub-level。目前更流行的是词根分词（sub-level）。我们假设文本通过tokenizer得到一个$(1,40)$的一个向量，这个就是准备好的Inputs。</p>
 <p>之后，我们将Inputs输入到Embedding层（假设Embedding维度为1024），得到一个$(1,50,512)$的词嵌入向量（Embedding中会将Inputs变为one-hot编码之后做矩阵运算（1，50，vocab_size）@（vocab_size，512））。</p>
-<p><img src="/blog/./transformer/2.jpg" srcset="/blog/img/loading.gif" lazyload></p>
+<img src="/blog/2023/12/19/2023/12/19/transformer/2.jpg" srcset="/blog/img/loading.gif" lazyload class="">
+
 <p>此论文中的提出的位置编码是确定的值，只与位置有关无需训练得到，pos就是词的位置（这里的词不是word而是sub），$d_{model}$是超参数，这里举例512，维度是$(50,512)$。之后我们将Position Embedding扩展一个维度与Embedding嵌入逐元素相加之后输入到Encoder。</p>
-<p><img src="/blog/./transformer/3.jpg" srcset="/blog/img/loading.gif" lazyload></p>
+<img src="/blog/2023/12/19/2023/12/19/transformer/3.jpg" srcset="/blog/img/loading.gif" lazyload class="">
+
 <p>接下来，我们拿一个Encoder举例，N×代表多个Encoder叠加。Encoder的第一个模块是多头注意力（Multi-Head Attention），也是Transformer的核心。</p>
 <h3 id="多头注意力"><a href="#多头注意力" class="headerlink" title="多头注意力"></a>多头注意力</h3><p>多头注意力是由多个缩放点积注意力（自注意力Self-Attention）组成的。</p>
-<p><img src="/blog/./transformer/4.jpg" srcset="/blog/img/loading.gif" lazyload></p>
+<img src="/blog/2023/12/19/2023/12/19/transformer/4.jpg" srcset="/blog/img/loading.gif" lazyload class="">
+
 <p>多头注意力首先有三个全连接层$W_{Q}$，$W_{K}$，$W_{V}$，Encoder的输入经过这三个全连接层得到$Q、K、V$三个向量，维度都是$(1,50,512)$，之后拆分成8个缩放点积注意力，$q、k、v$维度变为$(1,8,50,64)$。然后计算Attention（公式如上$d_{k}$是$k$的最后一个维度，因为前面的层用的是$d_{model}$所以仍然是512）。每一个 Attention的维度$(1,1,50,64)$，之后再拼接起来就是$(1,8,50,64)$，之后再做维度变换变成$(1,50,512)$。之后做残差连接，然后层归一化（Add &amp; Norm）。</p>
 <p>之后就就进入到一个前馈网络，前馈网络由两个全连接层组成，主要用来做放缩，之后同样做残差连接，然后层归一化（Add &amp; Norm）。最后得到Encoder的输出，也被称为Encoder Hidden State。</p>
-<p><img src="/blog/./transformer/5.jpg" srcset="/blog/img/loading.gif" lazyload></p>
+<img src="/blog/2023/12/19/2023/12/19/transformer/5.jpg" srcset="/blog/img/loading.gif" lazyload class="">
+
 <h2 id="解码器Decoder"><a href="#解码器Decoder" class="headerlink" title="解码器Decoder"></a>解码器Decoder</h2><p>解码器与编码器的层结构完全一样，只不过一个解码器有两个注意力层和一个前馈网络层。</p>
 <p>第一个注意力是自己的注意力，第二个注意力是结合了Encoder Hidden State，即Encoder的输出作为</p>
 <p>$K、V$，Decoder的第一个注意力层的输出作为$Q$，然后计算Attention分数。</p>
 <p>最终Decoder模块的输出会经过全连接层和SoftMax来得到词表中每个词的概率值 ，选出概率最高的作为候选值。</p>
 <h2 id="为什么可以实现并行训练？"><a href="#为什么可以实现并行训练？" class="headerlink" title="为什么可以实现并行训练？"></a>为什么可以实现并行训练？</h2><p>在实现细节里，还有很重要的一个部分就是掩码mask，Transformer通过掩码矩阵，使得模型在单步训练中只可以看到它应该看到的信息。在 mask 里，应该被忽略的我们会设成 1，应该被保留的会设成 0。如果 mask 相应位置上为 1，那么我们就给对应的 logits 加上一个超级小的负数， -1e-12， 这样，对应的 logits 也就变成了一个超级小的数。然后在计算 softmax 的时候，一个超级小的数的指数会无限接近与 0。也就是它对应的 attention 的权重就是 0 了。</p>
-<p><img src="/blog/./transformer/6.jpg" srcset="/blog/img/loading.gif" lazyload></p>
+<img src="/blog/2023/12/19/2023/12/19/transformer/6.jpg" srcset="/blog/img/loading.gif" lazyload class="">
+
 <p>对于Encoder，有两个mask，第一个mask是为了屏蔽掉padding部分，在最开始做数据处理时，需要对文本对齐，比如我们规定文本tokenizer之后的id长度最大为50。另外一个是类似的上三角矩阵。第一个词只能注意到自己，第二个词可以注意到第一个词。第三个词可以注意到前两个词，依次类推。。。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 1. padding_mask</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">create_padding_mask</span>(<span class="hljs-params">batch_data</span>):<br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    :param batch_data: [batch_size, seq_len]</span><br><span class="hljs-string">    :return: [batch_size, 1, 1, seq_len]</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    padding_mask = tf.cast(tf.math.equal(batch_data, <span class="hljs-number">0</span>), dtype=tf.float32)<br>    <span class="hljs-keyword">return</span> padding_mask[:, tf.newaxis, tf.newaxis, :]<br><br><br><br><span class="hljs-comment"># 2. look_ahead_mask(上三角矩阵，每个词只能注意到前面的没有预知未来的能力)</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">create_look_ahead_mask</span>(<span class="hljs-params">size</span>):<br>    mask = <span class="hljs-number">1</span> - tf.linalg.band_part(tf.ones((size, size)), -<span class="hljs-number">1</span>, <span class="hljs-number">0</span>)<br>    <span class="hljs-keyword">return</span> mask <span class="hljs-comment"># (seq_len, seq_len)</span><br><br><br></code></pre></td></tr></table></figure>
 
 <p>对于Decoder，先来说第二个注意力，在$Q*K^T$的运算后得logits，维度是$(…, seq_len_q, seq_len_k)$，logits需要加上Encoder的padding_mask，因为Decoder不需要花费精力去注意Encoder的padding部分。其次来看第一个注意力，第一个注意力与Encoder一样，训练过程中，每一个位置的词不应该看到后面位置的词，以及不应该花时间去注意padding的部分（对于训练而言）。</p>
 <p>个人理解所谓的并行训练就是不需要等待输出结果，每一次Decoder的输入都会使用每个位置正确的词。在推理（预测）中，是不可以并行的，依然需要串行生成。</p>
 <h2 id="学习率warm-up"><a href="#学习率warm-up" class="headerlink" title="学习率warm-up"></a>学习率warm-up</h2><p>这并不是开创性工作，但是这篇论文里用到了这个技术，那就来简单说一说，学习率预热是指在训练的初始阶段，学习率会从一个很小的值逐渐增加，根据设定的超参数决定在哪一步达到设置的值，之后保持不变，这种称之为warm-up_constant，还有很多变种其中包括先上升后下降。</p>
-<p><img src="/blog/./transformer/7.jpg" srcset="/blog/img/loading.gif" lazyload></p>
+<img src="/blog/2023/12/19/2023/12/19/transformer/7.jpg" srcset="/blog/img/loading.gif" lazyload class="">
+
 <h2 id="机器翻译的评价指标——bleu"><a href="#机器翻译的评价指标——bleu" class="headerlink" title="机器翻译的评价指标——bleu"></a>机器翻译的评价指标——bleu</h2><p>论文里作者着眼NLP领域的机器翻译任务，采用bleu评价指标，在这里做一个介绍。</p>
 <h3 id="什么是bleu？"><a href="#什么是bleu？" class="headerlink" title="什么是bleu？"></a>什么是bleu？</h3><p>BLEU（Bilingual Evaluation Understudy）是一种用于自动评估机器翻译质量的指标。它最初由Kishore Papineni等人在2002年提出，旨在解决人工评估翻译质量的主观性和费时性问题。BLEU的工作原理是将机器生成的翻译与人工参考翻译进行比较，并根据它们之间的相似性分配一个分数。我们可以通过微软的nltk框架来使用bleu指标。</p>
 <p>BLEU的计算方式如下：</p>
@@ -415,7 +427,7 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>page</div>
+      <div>论文解读——Attention is all you need（理解transformer原理及实现）</div>
       <div>https://jiawei804.github.io/blog/2023/12/19/2023/12/19/transformer/</div>
     </div>
     <div class="license-meta">
@@ -522,6 +534,12 @@
 
 
   
+
+
+  
+  
+
+
 
 
 
@@ -711,6 +729,49 @@
 
 
   <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
 
   <script  src="/blog/js/local-search.js" ></script>
 
