@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://jiawei804.github.io/blog/images/2023/12-21.jpg">
 <meta property="article:published_time" content="2023-12-20T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-12-21T09:48:13.861Z">
+<meta property="article:modified_time" content="2023-12-21T09:54:25.505Z">
 <meta property="article:author" content="Zhang Jiawei">
 <meta property="article:tag" content="DeepLearning">
 <meta property="article:tag" content="Diffusion Model">
@@ -340,7 +340,6 @@
 <h2 id="DDPM原理"><a href="#DDPM原理" class="headerlink" title="DDPM原理"></a>DDPM原理</h2><p>扩散模型（Diffusion Model）是一种基于物理热力学扩散思想的深度学习生成模型，包括前向扩散和反向扩散两个过程。不太懂的朋友，不妨想象一下，一滴墨水滴入盛满水的杯中逐渐扩散到整个系统的情景。非平衡热力学描述这滴墨水随时间推移的扩散过程中每一个“时间步”状态的概率分布——从一个初始的复杂概率分布逐步扩散变成简单均匀的分布。如果可以反向求出这个过程，那么就可以从简单分布中推导复杂分布。说起扩散模型，甚至可以追溯一下它的前辈——VAE（变分自编码器）和GAN（生成对抗网络），不过这不在本文的讨论范围。</p>
 <p>公认最早的扩散模型DDPM（Denoising Diffusion Probabilistic Model），假设了扩散过程是一个马尔可夫过程（每一个时间步的状态仅有上一个时间步状态的概率分布加上当前时间步的高斯噪声得到），以及扩散过程的逆过程是高斯分布等。</p>
 <p>DDPM的收敛速度与马尔可夫时间步长和样本空间大小（resolution和sample size）成正比。在DDPM中，逆向过程近似于前向过程中添加的高斯噪声；需要迭代所有数千个时间步才能生成一个样本批次。</p>
-<img src="/blog/2023/12/21/2023/12/21/DDPM/DDPM.png" srcset="/blog/img/loading.gif" lazyload class="">
 <figure>
     <img src="DDPM.png" srcset="/blog/img/loading.gif" lazyload alt="DDPM" style="width:100%;">
     <figcaption>图1: DDPM过程</figcaption>
@@ -362,16 +361,25 @@
 <p>则$x_{t-1}$的公式：<br>$$<br>x_{t-1}&#x3D;\frac{1}{\sqrt{\alpha}_t}(x_t-\frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}\epsilon)<br>$$</p>
 <p>扩散模型的优化目标数学表达式：<br>$$<br>L^{simple}_{t-1}&#x3D;E_{x_0,\epsilon\sim\mathcal{N}(0,I)}[||\epsilon-\epsilon_\theta(x_t,t)||^2]<br>$$</p>
 <p>在DDIM论文中损失做了一些调整（如下）。现在的扩散模型几乎都采用了DDIM提出了新的采样方式（而非像DDPM一样的马尔可夫过程每一步的采样都依赖上一步的结果），这样的好处是大大提高了采样的效率，之后可能会写一篇关于DDIM的分析。<br>$$<br>\mathcal{L}_{final}&#x3D;\mathcal{L}_{mse}+\lambda\mathcal{L}_{vlb}<br>$$</p>
-<h2 id="扩散过程"><a href="#扩散过程" class="headerlink" title="扩散过程"></a>扩散过程</h2><img src="/blog/2023/12/21/2023/12/21/DDPM/DDPM1.jpg" srcset="/blog/img/loading.gif" lazyload class="">
+<h2 id="扩散过程"><a href="#扩散过程" class="headerlink" title="扩散过程"></a>扩散过程</h2><figure>
+    <img src="DDPM1.jpg" srcset="/blog/img/loading.gif" lazyload alt="DDPM" style="width:100%;">
+    <figcaption>图2: 扩散原理</figcaption>
+</figure>
 
 
 <p>一个简单的扩散模型工作的示意图，将输入数据$Z$不断添加高斯噪声，即Diffusion Process来生成带噪数据$Z_T$，之后通过U-Net网络。</p>
 <p>使用U-Net网络你有两种选择，一种是直接预测最后的结果，一种是进行噪声的预测（Diffusers库中实现通过对噪声预测）。在实践验证中，DDPM选择了对噪声的预测，此后的研究均是通过UNet预测噪声来优化网络参数。</p>
-<img src="/blog/2023/12/21/2023/12/21/DDPM/DDPM2.jpg" srcset="/blog/img/loading.gif" lazyload class="">
+<figure>
+    <img src="DDPM2.jpg" srcset="/blog/img/loading.gif" lazyload alt="DDPM" style="width:100%;">
+    <figcaption>图3: 算法流程</figcaption>
+</figure>
 
 
 <p>Algorithm 1展示了完整的训练优化过程，损失经过简化变成一个简单的均方损失函数。Algorithm 2中第4行公式$\epsilon$代表预测噪声，反向过程（马尔科夫过程）需要逐步去噪，$\alpha_t$是时间步调度器（与时间步设置有关），其次是一个$\sigma_tz$，是因为DDPM中每次在去噪后的图像上会再加入一点噪声来增加生成的多样性。</p>
-<img src="/blog/2023/12/21/2023/12/21/DDPM/DDPM3.png" srcset="/blog/img/loading.gif" lazyload class="">
+<figure>
+    <img src="DDPM3.png" srcset="/blog/img/loading.gif" lazyload alt="DDPM" style="width:100%;">
+    <figcaption>图4: 时间步长调度器超参变化曲线</figcaption>
+</figure>
 
 
 <p>简单实现扩散模型的训练过程。</p>
