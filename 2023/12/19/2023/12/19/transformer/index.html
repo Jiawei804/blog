@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://jiawei804.github.io/blog/images/2023/12-19.jpg">
 <meta property="article:published_time" content="2023-12-18T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-12-22T03:09:30.636Z">
+<meta property="article:modified_time" content="2023-12-22T03:26:03.627Z">
 <meta property="article:author" content="Zhang Jiawei">
 <meta property="article:tag" content="DeepLearning">
 <meta name="twitter:card" content="summary_large_image">
@@ -341,7 +341,7 @@
 <h2 id="Transformer究竟长什么样子？"><a href="#Transformer究竟长什么样子？" class="headerlink" title="Transformer究竟长什么样子？"></a>Transformer究竟长什么样子？</h2><p>话不多说，先上图。</p>
 <figure>
     <img src="1.jpg" srcset="/blog/img/loading.gif" lazyload alt="Transformer" style="width:100%;">
-    <figcaption>图1: Transofrmer结构</figcaption>
+    <figcaption style="font-size: 14px;">图1: Transofrmer结构</figcaption>
 </figure>
 
 
@@ -351,7 +351,7 @@
 <p>之后，我们将Inputs输入到Embedding层（假设Embedding维度为512），得到一个$(1,50,512)$的词嵌入向量（Embedding中会将Inputs变为one-hot编码之后做矩阵运算（1，50，vocab_size）@（vocab_size，512））。</p>
 <figure>
     <img src="2.jpg" srcset="/blog/img/loading.gif" lazyload alt="Transformer" style="width:100%;">
-    <figcaption>图2: Position Embedding</figcaption>
+    <figcaption style="font-size: 14px;">图2: Position Embedding</figcaption>
 </figure>
 
 <p>此论文中的提出的位置编码是确定的值，只与位置有关无需训练得到，pos就是词的位置（这里的词不是word而是sub），$d_{model}$是超参数，这里举例512，维度是$(50,512)$。之后我们将Position Embedding扩展一个维度与Embedding嵌入逐元素相加之后输入到Encoder。</p>
@@ -388,7 +388,7 @@
 
 <figure>
     <img src="3.jpg" srcset="/blog/img/loading.gif" lazyload alt="Transformer" style="width:80%;">
-    <figcaption>图3: Position Embedding热力图</figcaption>
+    <figcaption style="font-size: 14px;">图3: Position Embedding热力图</figcaption>
 </figure>
 
 
@@ -396,7 +396,7 @@
 <h3 id="多头注意力"><a href="#多头注意力" class="headerlink" title="多头注意力"></a>多头注意力</h3><p>多头注意力是由多个缩放点积注意力（自注意力Self-Attention）组成的。</p>
 <figure>
     <img src="4.jpg" srcset="/blog/img/loading.gif" lazyload alt="Transformer" style="width:80%;">
-    <figcaption>图4: 缩放点积注意力与注意力计算公式</figcaption>
+    <figcaption style="font-size: 14px;">图4: 缩放点积注意力与注意力计算公式</figcaption>
 </figure>
 
 
@@ -404,7 +404,7 @@
 <p>之后就就进入到一个前馈网络，前馈网络由两个全连接层组成，主要用来做放缩，之后同样做残差连接，然后层归一化（Add &amp; Norm）。最后得到Encoder的输出，也被称为Encoder Hidden State。</p>
 <figure>
     <img src="5.jpg" srcset="/blog/img/loading.gif" lazyload alt="Transformer" style="width:80%;">
-    <figcaption>图5: 缩放点积注意力与多头注意力</figcaption>
+    <figcaption style="font-size: 14px;">图5: 缩放点积注意力与多头注意力</figcaption>
 </figure>
 
 
@@ -415,7 +415,7 @@
 <h2 id="为什么可以实现并行训练？"><a href="#为什么可以实现并行训练？" class="headerlink" title="为什么可以实现并行训练？"></a>为什么可以实现并行训练？</h2><p>在实现细节里，还有很重要的一个部分就是掩码mask，Transformer通过掩码矩阵，使得模型在单步训练中只可以看到它应该看到的信息。在 mask 里，应该被忽略的我们会设成 1，应该被保留的会设成 0。如果 mask 相应位置上为 1，那么我们就给对应的 logits 加上一个超级小的负数， -1e-12， 这样，对应的 logits 也就变成了一个超级小的数。然后在计算 softmax 的时候，一个超级小的数的指数会无限接近与 0。也就是它对应的 attention 的权重就是 0 了。</p>
 <figure>
     <img src="6.jpg" srcset="/blog/img/loading.gif" lazyload alt="Transformer" style="width:80%;">
-    <figcaption>图5: mask掩码</figcaption>
+    <figcaption style="font-size: 14px;">图5: mask掩码</figcaption>
 </figure>
 
 
@@ -442,8 +442,8 @@
 <p>个人理解所谓的并行训练就是不需要等待输出结果，每一次Decoder的输入都会使用每个位置正确的词。在推理（预测）中，是不可以并行的，依然需要串行生成。</p>
 <h2 id="学习率warm-up"><a href="#学习率warm-up" class="headerlink" title="学习率warm-up"></a>学习率warm-up</h2><p>这并不是开创性工作，但是这篇论文里用到了这个技术，那就来简单说一说，学习率预热是指在训练的初始阶段，学习率会从一个很小的值逐渐增加，根据设定的超参数决定在哪一步达到设置的值，之后保持不变，这种称之为warm-up_constant，还有很多变种其中包括先上升后下降。</p>
 <figure>
-    <img src="7.jpg" srcset="/blog/img/loading.gif" lazyload alt="Transformer" style="width:80%;">
-    <figcaption>图5: warm-up学习率预热曲线</figcaption>
+    <img src="7.jpg" srcset="/blog/img/loading.gif" lazyload alt="Transformer" style="width:60%;">
+    <figcaption style="font-size: 14px;">图5: warm-up学习率预热曲线</figcaption>
 </figure>
 
 
