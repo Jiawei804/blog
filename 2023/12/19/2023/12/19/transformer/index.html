@@ -355,7 +355,35 @@
 </figure>
 
 <p>此论文中的提出的位置编码是确定的值，只与位置有关无需训练得到，pos就是词的位置（这里的词不是word而是sub），$d_{model}$是超参数，这里举例512，维度是$(50,512)$。之后我们将Position Embedding扩展一个维度与Embedding嵌入逐元素相加之后输入到Encoder。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># PE(pos, 2i)   = sin(pos / 10000^(2i/d_model))</span><br><span class="hljs-comment"># PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))</span><br><br><span class="hljs-comment"># pos 和 i</span><br><span class="hljs-comment"># pos.shape: (seq_len, 1)</span><br><span class="hljs-comment"># i.shape: (1, d_model)</span><br><span class="hljs-comment"># PE(pos, i).shape: (seq_len, d_model)</span><br><br><span class="hljs-comment"># 计算 pos / 10000^(2i/d_model)</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">get_angles</span>(<span class="hljs-params">pos, i, d_model</span>):<br>    angles = <span class="hljs-number">1</span> / np.power(<span class="hljs-number">10000</span>, (<span class="hljs-number">2</span> * (i // <span class="hljs-number">2</span>)) / np.float32(d_model))<br>    <span class="hljs-keyword">return</span> pos * angles<br><span class="hljs-comment"># 计算位置信息,sentence_length长度是多少，就有多少个位置要变为位置编码</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">get_position_embedding</span>(<span class="hljs-params">sentence_length, d_model</span>):<br>    <br>    <br>    angle_rads = get_angles(np.arange(sentence_length)[:, np.newaxis],<br>                            np.arange(d_model)[np.newaxis, :],<br>                            d_model)<br>    <span class="hljs-comment"># sines.shape: [seq_len, d_model / 2]</span><br>    <span class="hljs-comment"># cosines.shape: [seq_len, d_model / 2]</span><br>    sines = np.sin(angle_rads[:, <span class="hljs-number">0</span>::<span class="hljs-number">2</span>])<br>    cosines = np.cos(angle_rads[:, <span class="hljs-number">1</span>::<span class="hljs-number">2</span>])<br>    <span class="hljs-comment"># position_embedding.shape: [seq_len, d_model]</span><br>    position_embedding = np.concatenate([sines, cosines], axis=-<span class="hljs-number">1</span>)<br>    <span class="hljs-comment"># 进行维度扩展，把[seq_len, d_model]，变为[1, seq_len, d_model]</span><br>    position_embedding = position_embedding[np.newaxis, ...]<br>    <span class="hljs-comment"># 变为float32类型 </span><br>    <span class="hljs-keyword">return</span> tf.cast(position_embedding, dtype=tf.float32)<br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># PE(pos, 2i)   = sin(pos / 10000^(2i/d_model))</span>
+<span class="hljs-comment"># PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))</span>
+
+<span class="hljs-comment"># pos 和 i</span>
+<span class="hljs-comment"># pos.shape: (seq_len, 1)</span>
+<span class="hljs-comment"># i.shape: (1, d_model)</span>
+<span class="hljs-comment"># PE(pos, i).shape: (seq_len, d_model)</span>
+
+<span class="hljs-comment"># 计算 pos / 10000^(2i/d_model)</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">get_angles</span>(<span class="hljs-params">pos, i, d_model</span>):
+    angles = <span class="hljs-number">1</span> / np.power(<span class="hljs-number">10000</span>, (<span class="hljs-number">2</span> * (i // <span class="hljs-number">2</span>)) / np.float32(d_model))
+    <span class="hljs-keyword">return</span> pos * angles
+<span class="hljs-comment"># 计算位置信息,sentence_length长度是多少，就有多少个位置要变为位置编码</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">get_position_embedding</span>(<span class="hljs-params">sentence_length, d_model</span>):
+    
+    
+    angle_rads = get_angles(np.arange(sentence_length)[:, np.newaxis],
+                            np.arange(d_model)[np.newaxis, :],
+                            d_model)
+    <span class="hljs-comment"># sines.shape: [seq_len, d_model / 2]</span>
+    <span class="hljs-comment"># cosines.shape: [seq_len, d_model / 2]</span>
+    sines = np.sin(angle_rads[:, <span class="hljs-number">0</span>::<span class="hljs-number">2</span>])
+    cosines = np.cos(angle_rads[:, <span class="hljs-number">1</span>::<span class="hljs-number">2</span>])
+    <span class="hljs-comment"># position_embedding.shape: [seq_len, d_model]</span>
+    position_embedding = np.concatenate([sines, cosines], axis=-<span class="hljs-number">1</span>)
+    <span class="hljs-comment"># 进行维度扩展，把[seq_len, d_model]，变为[1, seq_len, d_model]</span>
+    position_embedding = position_embedding[np.newaxis, ...]
+    <span class="hljs-comment"># 变为float32类型 </span>
+    <span class="hljs-keyword">return</span> tf.cast(position_embedding, dtype=tf.float32)</code></pre></div>
 
 
 <figure>
@@ -392,7 +420,23 @@
 
 
 <p>对于Encoder，有两个mask，第一个mask是为了屏蔽掉padding部分，在最开始做数据处理时，需要对文本对齐，比如我们规定文本tokenizer之后的id长度最大为50。另外一个是类似的上三角矩阵。第一个词只能注意到自己，第二个词可以注意到第一个词。第三个词可以注意到前两个词，依次类推。。。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 1. padding_mask</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">create_padding_mask</span>(<span class="hljs-params">batch_data</span>):<br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    :param batch_data: [batch_size, seq_len]</span><br><span class="hljs-string">    :return: [batch_size, 1, 1, seq_len]</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    padding_mask = tf.cast(tf.math.equal(batch_data, <span class="hljs-number">0</span>), dtype=tf.float32)<br>    <span class="hljs-keyword">return</span> padding_mask[:, tf.newaxis, tf.newaxis, :]<br><br><br><br><span class="hljs-comment"># 2. look_ahead_mask(上三角矩阵，每个词只能注意到前面的没有预知未来的能力)</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">create_look_ahead_mask</span>(<span class="hljs-params">size</span>):<br>    mask = <span class="hljs-number">1</span> - tf.linalg.band_part(tf.ones((size, size)), -<span class="hljs-number">1</span>, <span class="hljs-number">0</span>)<br>    <span class="hljs-keyword">return</span> mask <span class="hljs-comment"># (seq_len, seq_len)</span><br><br><br></code></pre></td></tr></table></figure>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># 1. padding_mask</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">create_padding_mask</span>(<span class="hljs-params">batch_data</span>):
+    <span class="hljs-string">&quot;&quot;&quot;</span>
+<span class="hljs-string">    :param batch_data: [batch_size, seq_len]</span>
+<span class="hljs-string">    :return: [batch_size, 1, 1, seq_len]</span>
+<span class="hljs-string">    &quot;&quot;&quot;</span>
+    padding_mask = tf.cast(tf.math.equal(batch_data, <span class="hljs-number">0</span>), dtype=tf.float32)
+    <span class="hljs-keyword">return</span> padding_mask[:, tf.newaxis, tf.newaxis, :]
+
+
+
+<span class="hljs-comment"># 2. look_ahead_mask(上三角矩阵，每个词只能注意到前面的没有预知未来的能力)</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">create_look_ahead_mask</span>(<span class="hljs-params">size</span>):
+    mask = <span class="hljs-number">1</span> - tf.linalg.band_part(tf.ones((size, size)), -<span class="hljs-number">1</span>, <span class="hljs-number">0</span>)
+    <span class="hljs-keyword">return</span> mask <span class="hljs-comment"># (seq_len, seq_len)</span>
+
+</code></pre></div>
 
 <p>对于Decoder，先来说第二个注意力，在$Q*K^T$的运算后得logits，维度是$(…, seq_len_q, seq_len_k)$，logits需要加上Encoder的padding_mask，因为Decoder不需要花费精力去注意Encoder的padding部分。其次来看第一个注意力，第一个注意力与Encoder一样，训练过程中，每一个位置的词不应该看到后面位置的词，以及不应该花时间去注意padding的部分（对于训练而言）。</p>
 <p>个人理解所谓的并行训练就是不需要等待输出结果，每一次Decoder的输入都会使用每个位置正确的词。在推理（预测）中，是不可以并行的，依然需要串行生成。</p>
@@ -415,9 +459,26 @@
 </li>
 </ol>
 <p><strong>公式如下：</strong><br>$$<br>bleu &#x3D; exp^{\sum weight*logP}*惩罚系数<br>$$</p>
-<h3 id="什么是n-gram？"><a href="#什么是n-gram？" class="headerlink" title="什么是n-gram？"></a>什么是n-gram？</h3><pre><code class="hljs">与其解释抽象的公式，不如来一段代码实战理解，请看下面这段代码。
-</code></pre>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> nltk.translate.bleu.score <span class="hljs-keyword">import</span> sentence_bleu<br>reference = [[<span class="hljs-string">&#x27;the&#x27;</span>,<span class="hljs-string">&#x27;quick&#x27;</span>,<span class="hljs-string">&#x27;brown&#x27;</span>,<span class="hljs-string">&#x27;fox&#x27;</span>,<span class="hljs-string">&#x27;jumped&#x27;</span>,<span class="hljs-string">&#x27;over&#x27;</span>,<span class="hljs-string">&#x27;the&#x27;</span>,<span class="hljs-string">&#x27;lazy&#x27;</span>,<span class="hljs-string">&#x27;dog&#x27;</span>]]<br>candidate = [<span class="hljs-string">&#x27;the&#x27;</span>,<span class="hljs-string">&#x27;quick&#x27;</span>,<span class="hljs-string">&#x27;brown&#x27;</span>,<span class="hljs-string">&#x27;fox&#x27;</span>,<span class="hljs-string">&#x27;jumped&#x27;</span>,<span class="hljs-string">&#x27;over&#x27;</span>,<span class="hljs-string">&#x27;the&#x27;</span>,<span class="hljs-string">&#x27;lazy&#x27;</span>,<span class="hljs-string">&#x27;dog&#x27;</span>]<br>score = sentence.bleu(reference, candidate)<br><span class="hljs-built_in">print</span>(score)<br><span class="hljs-comment"># out: 1.0</span><br><br><span class="hljs-comment"># 4-gram cumulative BLEU</span><br>candidate = [<span class="hljs-string">&#x27;the&#x27;</span>,<span class="hljs-string">&#x27;fast&#x27;</span>,<span class="hljs-string">&#x27;brown&#x27;</span>,<span class="hljs-string">&#x27;fox&#x27;</span>,<span class="hljs-string">&#x27;jumped&#x27;</span>,<span class="hljs-string">&#x27;over&#x27;</span>,<span class="hljs-string">&#x27;the&#x27;</span>,<span class="hljs-string">&#x27;lazy&#x27;</span>,<span class="hljs-string">&#x27;dog&#x27;</span>]<br>score = sentence_bleu(reference, candidate, weights=(<span class="hljs-number">0.25</span>, <span class="hljs-number">0.25</span>, <span class="hljs-number">0.25</span>, <span class="hljs-number">0.25</span>))<br><span class="hljs-built_in">print</span>(score)<br><span class="hljs-comment"># out:0.75</span><br><br><span class="hljs-comment"># 手动计算</span><br><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np<br>score = np.exp(<span class="hljs-number">0.25</span> * (np.log(<span class="hljs-number">8</span>/<span class="hljs-number">9</span>) + np.log(<span class="hljs-number">6</span>/<span class="hljs-number">8</span>) + np.log(<span class="hljs-number">5</span>/<span class="hljs-number">7</span>) + np.log(<span class="hljs-number">4</span>/<span class="hljs-number">6</span>)))<br><span class="hljs-built_in">print</span>(score)<br><span class="hljs-comment"># out:0.75</span><br></code></pre></td></tr></table></figure>
+<h3 id="什么是n-gram？"><a href="#什么是n-gram？" class="headerlink" title="什么是n-gram？"></a>什么是n-gram？</h3><div class="code-wrapper"><pre><code class="hljs">与其解释抽象的公式，不如来一段代码实战理解，请看下面这段代码。
+</code></pre></div>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">from</span> nltk.translate.bleu.score <span class="hljs-keyword">import</span> sentence_bleu
+reference = [[<span class="hljs-string">&#x27;the&#x27;</span>,<span class="hljs-string">&#x27;quick&#x27;</span>,<span class="hljs-string">&#x27;brown&#x27;</span>,<span class="hljs-string">&#x27;fox&#x27;</span>,<span class="hljs-string">&#x27;jumped&#x27;</span>,<span class="hljs-string">&#x27;over&#x27;</span>,<span class="hljs-string">&#x27;the&#x27;</span>,<span class="hljs-string">&#x27;lazy&#x27;</span>,<span class="hljs-string">&#x27;dog&#x27;</span>]]
+candidate = [<span class="hljs-string">&#x27;the&#x27;</span>,<span class="hljs-string">&#x27;quick&#x27;</span>,<span class="hljs-string">&#x27;brown&#x27;</span>,<span class="hljs-string">&#x27;fox&#x27;</span>,<span class="hljs-string">&#x27;jumped&#x27;</span>,<span class="hljs-string">&#x27;over&#x27;</span>,<span class="hljs-string">&#x27;the&#x27;</span>,<span class="hljs-string">&#x27;lazy&#x27;</span>,<span class="hljs-string">&#x27;dog&#x27;</span>]
+score = sentence.bleu(reference, candidate)
+<span class="hljs-built_in">print</span>(score)
+<span class="hljs-comment"># out: 1.0</span>
+
+<span class="hljs-comment"># 4-gram cumulative BLEU</span>
+candidate = [<span class="hljs-string">&#x27;the&#x27;</span>,<span class="hljs-string">&#x27;fast&#x27;</span>,<span class="hljs-string">&#x27;brown&#x27;</span>,<span class="hljs-string">&#x27;fox&#x27;</span>,<span class="hljs-string">&#x27;jumped&#x27;</span>,<span class="hljs-string">&#x27;over&#x27;</span>,<span class="hljs-string">&#x27;the&#x27;</span>,<span class="hljs-string">&#x27;lazy&#x27;</span>,<span class="hljs-string">&#x27;dog&#x27;</span>]
+score = sentence_bleu(reference, candidate, weights=(<span class="hljs-number">0.25</span>, <span class="hljs-number">0.25</span>, <span class="hljs-number">0.25</span>, <span class="hljs-number">0.25</span>))
+<span class="hljs-built_in">print</span>(score)
+<span class="hljs-comment"># out:0.75</span>
+
+<span class="hljs-comment"># 手动计算</span>
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+score = np.exp(<span class="hljs-number">0.25</span> * (np.log(<span class="hljs-number">8</span>/<span class="hljs-number">9</span>) + np.log(<span class="hljs-number">6</span>/<span class="hljs-number">8</span>) + np.log(<span class="hljs-number">5</span>/<span class="hljs-number">7</span>) + np.log(<span class="hljs-number">4</span>/<span class="hljs-number">6</span>)))
+<span class="hljs-built_in">print</span>(score)
+<span class="hljs-comment"># out:0.75</span></code></pre></div>
 
 <ul>
 <li><p>过短惩罚系数，上例预测结果与目标结果长度一致，故为1。</p>
