@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>无分类器指导——classifier-free guidance scale</title>
+    <link href="/blog/2023/12/23/2023/12/23/cfg/"/>
+    <url>/blog/2023/12/23/2023/12/23/cfg/</url>
+    
+    <content type="html"><![CDATA[<p><a href="https://getimg.ai/guides/interactive-guide-to-stable-diffusion-guidance-scale-parameter">原文链接</a></p><p>Simply put, the CFG scale (classifier-free guidance scale) or guidance scale is a parameter that controls how much the image generation process follows the text prompt. The higher the value, the more the image sticks to a given text input.</p><p>But this does not mean that the value should always be set to maximum, as more guidance means less diversity and quality.</p><p>It showcases the same generation of ‘panda playing guitar’ with different guidance values.<span style="color: red;">Please read the original text.</span></p><p>The text prompt is ignored when the guidance scale value is set to 1. It’s strictly followed with a maximum of 20 but with worse image quality. The most ‘creative’ and ‘artistic’ results are usually generated around a guidance scale of 7-12. But using a scale up to 15 still produces results with little to no artifacts.</p><p>Setting the right value depends on your desired results and also the text prompt’s complexity. The decision is yours, but it is always best to experiment with different scales to see whether more creative results or results strictly adhering to the prompt are better for your use case.</p><p>If you are trying to generate an image with more tiny details specified in the prompt, you can start with a higher guidance scale between 12 and 16.</p><p>We hope our guide helped you understand the CFG scale&#x2F;guidance scale parameter in Stable Diffusion, and you’ll use what you’ve learned to create something amazing.</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>人工智能</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Diffusion Model</tag>
+      
+      <tag>Text2Image</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>论文解读——Denoising Diffusion Probability Model原理与代码分析</title>
     <link href="/blog/2023/12/21/2023/12/21/DDPM/"/>
     <url>/blog/2023/12/21/2023/12/21/DDPM/</url>

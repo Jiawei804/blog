@@ -16,27 +16,27 @@
   <meta name="author" content="Zhang Jiawei">
   <meta name="keywords" content="">
   
-    <meta name="description" content="论文解读——Denoising Diffusion Probability Model原理与代码分析neurips2020  摘要：使用扩散模型生成高质量图像，扩散概率模型和朗之万动力学的去噪分数匹配之间的联系设计的加权变分界进行训练来获得最佳结果，在学术界被认为是最早的扩散模型，尽管2015年Jascha Sohl-Dickstein等人已经提出了扩散概率模型。 论文主要贡献： 1.作者证明了扩">
+    <meta name="description" content="原文链接 Simply put, the CFG scale (classifier-free guidance scale) or guidance scale is a parameter that controls how much the image generation process follows the text prompt. The higher the value, the">
 <meta property="og:type" content="article">
-<meta property="og:title" content="论文解读——Denoising Diffusion Probability Model原理与代码分析">
-<meta property="og:url" content="https://jiawei804.github.io/blog/2023/12/21/2023/12/21/DDPM/index.html">
+<meta property="og:title" content="无分类器指导——classifier-free guidance scale">
+<meta property="og:url" content="https://jiawei804.github.io/blog/2023/12/23/2023/12/23/cfg/index.html">
 <meta property="og:site_name" content="Jiawei&#39;s Blog">
-<meta property="og:description" content="论文解读——Denoising Diffusion Probability Model原理与代码分析neurips2020  摘要：使用扩散模型生成高质量图像，扩散概率模型和朗之万动力学的去噪分数匹配之间的联系设计的加权变分界进行训练来获得最佳结果，在学术界被认为是最早的扩散模型，尽管2015年Jascha Sohl-Dickstein等人已经提出了扩散概率模型。 论文主要贡献： 1.作者证明了扩">
+<meta property="og:description" content="原文链接 Simply put, the CFG scale (classifier-free guidance scale) or guidance scale is a parameter that controls how much the image generation process follows the text prompt. The higher the value, the">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://jiawei804.github.io/blog/images/2023/12-21.jpg">
-<meta property="article:published_time" content="2023-12-20T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-12-23T02:51:28.561Z">
+<meta property="og:image" content="https://jiawei804.github.io/blog/images/2023/12-23.jpg">
+<meta property="article:published_time" content="2023-12-22T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-23T14:45:58.743Z">
 <meta property="article:author" content="Zhang Jiawei">
-<meta property="article:tag" content="DeepLearning">
 <meta property="article:tag" content="Diffusion Model">
+<meta property="article:tag" content="Text2Image">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://jiawei804.github.io/blog/images/2023/12-21.jpg">
+<meta name="twitter:image" content="https://jiawei804.github.io/blog/images/2023/12-23.jpg">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
   
   
-  <title>论文解读——Denoising Diffusion Probability Model原理与代码分析 - Jiawei&#39;s Blog</title>
+  <title>无分类器指导——classifier-free guidance scale - Jiawei&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -248,13 +248,13 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('/blog/images/2023/12-21-cover.jpg') no-repeat center center; background-size: cover;">
+     style="background: url('/blog/images/2023/12-23-cover.jpg') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="论文解读——Denoising Diffusion Probability Model原理与代码分析"></span>
+            <span id="subtitle" data-typed-text="无分类器指导——classifier-free guidance scale"></span>
           
         </div>
 
@@ -265,8 +265,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-12-21 00:00" pubdate>
-          2023年12月21日 凌晨
+        <time datetime="2023-12-23 00:00" pubdate>
+          2023年12月23日 凌晨
         </time>
       </span>
     
@@ -277,7 +277,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.6k 字
+          4 字
         
       </span>
     
@@ -288,7 +288,7 @@
         
         
         
-          13 分钟
+          1 分钟
         
       </span>
     
@@ -325,130 +325,19 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">论文解读——Denoising Diffusion Probability Model原理与代码分析</h1>
+            <h1 id="seo-header">无分类器指导——classifier-free guidance scale</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="论文解读——Denoising-Diffusion-Probability-Model原理与代码分析"><a href="#论文解读——Denoising-Diffusion-Probability-Model原理与代码分析" class="headerlink" title="论文解读——Denoising Diffusion Probability Model原理与代码分析"></a>论文解读——Denoising Diffusion Probability Model原理与代码分析</h1><p><code>neurips2020</code></p>
-<blockquote>
-<p>摘要：使用扩散模型生成高质量图像，扩散概率模型和朗之万动力学的去噪分数匹配之间的联系设计的加权变分界进行训练来获得最佳结果，在学术界被认为是最早的扩散模型，尽管2015年Jascha Sohl-Dickstein等人已经提出了扩散概率模型。</p>
-<p>论文主要贡献：</p>
-<p>1.作者证明了扩散模型能够生成高质量图像样本。</p>
-<p>2.在假设马尔可夫过程的前提下，作者发现了扩散模型 与变分推理之间的联系，使得可以训练一个优秀的神经网络来生成高质量样本。</p>
-</blockquote>
-<h2 id="DDPM原理"><a href="#DDPM原理" class="headerlink" title="DDPM原理"></a>DDPM原理</h2><p>扩散模型（Diffusion Model）是一种基于物理热力学扩散思想的深度学习生成模型，包括前向扩散和反向扩散两个过程。不太懂的朋友，不妨想象一下，一滴墨水滴入盛满水的杯中逐渐扩散到整个系统的情景。非平衡热力学描述这滴墨水随时间推移的扩散过程中每一个“时间步”状态的概率分布——从一个初始的复杂概率分布逐步扩散变成简单均匀的分布。如果可以反向求出这个过程，那么就可以从简单分布中推导复杂分布。说起扩散模型，甚至可以追溯一下它的前辈——VAE（变分自编码器）和GAN（生成对抗网络），不过这不在本文的讨论范围。</p>
-<p>公认最早的扩散模型DDPM（Denoising Diffusion Probabilistic Model），假设了扩散过程是一个马尔可夫过程（每一个时间步的状态仅有上一个时间步状态的概率分布加上当前时间步的高斯噪声得到），以及扩散过程的逆过程是高斯分布等。</p>
-<p>DDPM的收敛速度与马尔可夫时间步长和样本空间大小（resolution和sample size）成正比。在DDPM中，逆向过程近似于前向过程中添加的高斯噪声；需要迭代所有数千个时间步才能生成一个样本批次。</p>
-<figure>
-    <img src="DDPM.png" srcset="/blog/img/loading.gif" lazyload alt="DDPM" style="width:100%;">
-    <figcaption>图1: DDPM过程</figcaption>
-</figure>
-
-
-<p>如图1所示，$x_0$到$x_T$是对数据进行加噪的前向过程，DDPM假设了扩散过程是一个马尔可夫过程（每一个时间步的概率分布仅由上一个时间步状态的概率分布加上当前时间步的高斯噪声得到）。时间步$t-1$到时间步$t$的单步加噪过程的数学表达式如下：<br>$$<br>q(x_t|x_{t-1})&#x3D;\mathcal{N}(x_t; \sqrt{1-\beta_t}x_{t-1}, \beta_tI)<br>$$</p>
-<p>噪声的方差是一个位于区间$(0,1)$的固定值$\beta_t$确定，均值则由固定值$\beta_t$和当前时刻“带噪”的数据分布确定。</p>
-<p>最终的噪声分布数学表达式如下：<br>$$<br>q(x_{1:T}|x_0)&#x3D;\prod_{t&#x3D;1}^{T}q(x_t|x_{t-1})<br>$$</p>
-<p>设 $\alpha_t:&#x3D;1-\beta_t$，$\bar{\alpha}_{t}:&#x3D;\prod_{s&#x3D;1}^{t}\alpha_s$，则有：<br>$$<br>q(x_t|x_0)&#x3D;\mathcal{N}(x_t;\sqrt{\bar{\alpha}_t}x_0,(1-\bar{\alpha}_t)I)<br>$$</p>
-<p>$x_t$的公式则为：<br>$$<br>x_t(x_0,\epsilon)&#x3D;\sqrt{\bar{\alpha}_t}x_0+\sqrt{1-\bar{\alpha}_t}\epsilon<br>$$</p>
-<p>前向过程是将数据噪声化的过程，前向过程的逆过程（反向过程）则是“去噪”的过程，即从随机噪声中迭代恢复出清晰数据的过程。DDPM将反向过程也视为一个马尔可夫链，这个马尔科夫链是由一系列神经网络参数化的高斯分布组成，也就是需要训练的扩散模型UNet。</p>
-<p>从时间步$t$到时间步$t-1$的单步反向“去噪”过程的数学表达式如下：<br>$$<br>p(x_{t-1}|x_t,x_0)&#x3D;\mathcal{N}(x_{t-1};\tilde{\mu}(x_t,x_0),\tilde{\beta}_tI)<br>$$</p>
-<p>UNet网络学习到的weights和bias就是反向过程的均值与方差（假设方差不固定需要学习，DDPM论文中固定了方差但在后续论文的改进中将其变为了可学习的参数），这涉及到了重参数化的思想，在这里简单介绍一下：</p>
-<p>正如 $p(x_{t-1}|x_t,x_0)$所示 ，我们要知道反向过程估计的复杂高斯分布$\mathcal{N}(x;\mu,\sigma)$ 的均值与方差，并在该分布下进行采样，而这样的采样是无法被神经网络所学习的。于是我们从简单高斯分布 $\mathcal{N}(x;0,1)$采样 $z$ ，假设参数 $w$和 $b$ 使得 $\mu$ 与 $\sigma$可以通过UNet网络对$w$ 和 $b$的学习来得到，这样随机性就只存在于$\mathcal{N}(x;0,1)$中，即：<br>$$<br>\mathcal{N}(x;\mu,\sigma)&#x3D;w*\mathcal{N}(x;0,1)+b<br>$$</p>
-<p>这就是<code>重参数化</code>，不过DDPM中固定了方差不变，只学习均值。通过重参数化，$\epsilon_t\sim\mathcal{N}(0, I)$可以得到采样：<br>$$<br>x_t &#x3D; \sqrt{\tilde{\alpha}} x_0+\sqrt{1-\tilde{\alpha}} \epsilon_t<br>$$</p>
-<p>正是因为反向过程的每一步都是参数化的高斯分布，因此可以分别求高斯分布的均值和方差。通过推导，可以得到时间步$t-1$的高斯分布$q(x_{t-1}|x_t,x_0)$的均值与方差的数学表达式：<br>$$<br>\tilde{\beta}_t&#x3D;\frac{1-\bar{\alpha}_{t-1}}{1-\bar{\alpha}_t}·\beta_t<br>$$</p>
-<p>$$<br>\tilde{\mu}(x_t,x_0)&#x3D;\frac{\sqrt\alpha_t(1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_t}x_t+\frac{\sqrt{\bar{\alpha}_{t-1}}\beta_t}{1-\bar{\alpha}_t}x_0<br>$$</p>
-<p>则$x_{t-1}$的公式：<br>$$<br>x_{t-1}&#x3D;\frac{1}{\sqrt{\alpha}_t}(x_t-\frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}\epsilon)<br>$$</p>
-<p>扩散模型的优化目标数学表达式：<br>$$<br>L^{simple}_{t-1}&#x3D;E_{x_0,\epsilon\sim\mathcal{N}(0,I)}[||\epsilon-\epsilon_\theta(x_t,t)||^2]<br>$$</p>
-<p>在DDIM论文中损失做了一些调整（如下）。现在的扩散模型几乎都采用了DDIM提出了新的采样方式（而非像DDPM一样的马尔可夫过程每一步的采样都依赖上一步的结果），这样的好处是大大提高了采样的效率，之后可能会写一篇关于DDIM的分析。<br>$$<br>\mathcal{L}_{final}&#x3D;\mathcal{L}_{mse}+\lambda\mathcal{L}_{vlb}<br>$$</p>
-<h2 id="扩散过程"><a href="#扩散过程" class="headerlink" title="扩散过程"></a>扩散过程</h2><figure>
-    <img src="DDPM1.jpg" srcset="/blog/img/loading.gif" lazyload alt="DDPM" style="width:80%;">
-    <figcaption>图2: 扩散原理</figcaption>
-</figure>
-
-
-<p>一个简单的扩散模型工作的示意图，将输入数据$Z$不断添加高斯噪声，即Diffusion Process来生成带噪数据$Z_T$，之后通过U-Net网络。</p>
-<p>使用U-Net网络你有两种选择，一种是直接预测最后的结果，一种是进行噪声的预测（Diffusers库中实现通过对噪声预测）。根据DIT论文中的表述，DDPM可能选择了对图像（Improvements in DDPMs over the past two years have largely been driven by improved sampling techniques, most notably classifierfree guidance, reformulating diffusion models to predict noise instead of pixels [DDPM] and using cascaded DDPM pipelines where low-resolution base diffusion models are trained in parallel with upsamplers）的预测，此后的研究改进并通过UNet预测噪声来优化网络参数。</p>
-<figure>
-    <img src="DDPM2.jpg" srcset="/blog/img/loading.gif" lazyload alt="DDPM" style="width:120%;">
-    <figcaption>图3: 算法流程</figcaption>
-</figure>
-
-
-<p>Algorithm 1展示了完整的训练优化过程，损失经过简化变成一个简单的均方损失函数。Algorithm 2中第4行公式$\epsilon$代表预测噪声，反向过程（马尔科夫过程）需要逐步去噪，$\alpha_t$是时间步调度器（与时间步设置有关），其次是一个$\sigma_tz$，是因为DDPM中每次在去噪后的图像上会再加入一点噪声来增加生成的多样性。</p>
-<figure>
-    <img src="DDPM3.png" srcset="/blog/img/loading.gif" lazyload alt="DDPM" style="width:70%;">
-    <figcaption>图4: 时间步长调度器超参变化曲线</figcaption>
-</figure>
-
-
-<p>简单实现扩散模型的训练过程。</p>
-<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">from</span> diffusers <span class="hljs-keyword">import</span> UNet2DModel
-<span class="hljs-keyword">from</span> diffusers <span class="hljs-keyword">import</span> DDPMScheduler
-<span class="hljs-keyword">import</span> torch
-
-<span class="hljs-comment"># create model</span>
-model = UNet2DModel(
-    sample_size=image_size,
-    in_channels=<span class="hljs-number">3</span>,
-    out_channels=<span class="hljs-number">3</span>,
-    layers_per_block=<span class="hljs-number">2</span>,
-    block_out_channels=(<span class="hljs-number">64</span>, <span class="hljs-number">128</span>, <span class="hljs-number">128</span>, <span class="hljs-number">256</span>),
-    down_block_types=(
-        <span class="hljs-string">&quot;DownBlock2D&quot;</span>,
-        <span class="hljs-string">&quot;DownBlock2D&quot;</span>,
-        <span class="hljs-string">&quot;AttnDownBlock2D&quot;</span>,
-        <span class="hljs-string">&quot;AttnDownBlock2D&quot;</span>,
-    ),
-    up_block_types=(
-        <span class="hljs-string">&quot;AttnUpBlock2D&quot;</span>,
-        <span class="hljs-string">&quot;AttnUpBlock2D&quot;</span>,
-        <span class="hljs-string">&quot;UpBlock2D&quot;</span>,
-        <span class="hljs-string">&quot;UpBlock2D&quot;</span>,
-    ),
-)
-model.to(device)
-
-<span class="hljs-comment"># 设定噪声调度器</span>
-noise_scheduler = DDPMScheduler(
-    num_train_timesteps=<span class="hljs-number">1000</span>,
-    beta_schedule=<span class="hljs-string">&quot;squaredcos_cap_v2&quot;</span>,
-)
-
-<span class="hljs-comment"># 训练循环</span>
-optimizer = torch.optim.AdamW(model.parameters(), lr=<span class="hljs-number">4e-4</span>)
-
-losses = []
-
-<span class="hljs-keyword">for</span> epoch <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">30</span>):
-    <span class="hljs-keyword">for</span> step, batch <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(train_dataloader):
-        clean_images = batch[<span class="hljs-string">&quot;images&quot;</span>].to(device)
-        <span class="hljs-comment"># add noisy for image</span>
-        noise = torch.randn(clean_images.shape).to(clean_images.device)
-        bs = clean_images.shape[<span class="hljs-number">0</span>]
-
-        <span class="hljs-comment"># select a random timestep for every image</span>
-        timesteps = torch.randint(
-            <span class="hljs-number">0</span>, noise_scheduler.num_train_timesteps, (bs,),
-            device=clean_images.device
-        ).long()
-
-        <span class="hljs-comment"># Add noise to a clear image based on the noise amplitude at each timestep</span>
-        noisy_images = noise_scheduler.add_noise(
-            clean_images,
-            noise,
-            timesteps
-        )
-
-        <span class="hljs-comment"># obtain results</span>
-        noise_pred = model(noisy_images, timesteps, return_dict=<span class="hljs-literal">False</span>)[<span class="hljs-number">0</span>]
-
-        <span class="hljs-comment"># compute loss</span>
-        loss = F.mse_loss(noise_pred, noise)
-        <span class="hljs-comment"># backward</span>
-        loss.backward(loss)</code></pre></div>
-
-<p>实验部分在CIFAR-10和CELEBA-HQ数据集上测试图像的生成能力，评估指标选用了FID与IS，更详细内容可以参考原<a target="_blank" rel="noopener" href="https://proceedings.neurips.cc/paper_files/paper/2020/file/4c5bcfec8584af0d967f1ab10179ca4b-Paper.pdf">论文</a>。</p>
+                <p><a target="_blank" rel="noopener" href="https://getimg.ai/guides/interactive-guide-to-stable-diffusion-guidance-scale-parameter">原文链接</a></p>
+<p>Simply put, the CFG scale (classifier-free guidance scale) or guidance scale is a parameter that controls how much the image generation process follows the text prompt. The higher the value, the more the image sticks to a given text input.</p>
+<p>But this does not mean that the value should always be set to maximum, as more guidance means less diversity and quality.</p>
+<p>It showcases the same generation of ‘panda playing guitar’ with different guidance values.<span style="color: red;">Please read the original text.</span></p>
+<p>The text prompt is ignored when the guidance scale value is set to 1. It’s strictly followed with a maximum of 20 but with worse image quality. The most ‘creative’ and ‘artistic’ results are usually generated around a guidance scale of 7-12. But using a scale up to 15 still produces results with little to no artifacts.</p>
+<p>Setting the right value depends on your desired results and also the text prompt’s complexity. The decision is yours, but it is always best to experiment with different scales to see whether more creative results or results strictly adhering to the prompt are better for your use case.</p>
+<p>If you are trying to generate an image with more tiny details specified in the prompt, you can start with a higher guidance scale between 12 and 16.</p>
+<p>We hope our guide helped you understand the CFG scale&#x2F;guidance scale parameter in Stable Diffusion, and you’ll use what you’ve learned to create something amazing.</p>
 
                 
               </div>
@@ -467,7 +356,7 @@ losses = []
     
       <span class="category-chain">
         
-  <a href="/blog/categories/%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BB/" class="category-chain-item">论文解读</a>
+  <a href="/blog/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" class="category-chain-item">人工智能</a>
   
   
 
@@ -482,9 +371,9 @@ losses = []
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/blog/tags/DeepLearning/" class="print-no-link">#DeepLearning</a>
-      
         <a href="/blog/tags/Diffusion-Model/" class="print-no-link">#Diffusion Model</a>
+      
+        <a href="/blog/tags/Text2Image/" class="print-no-link">#Text2Image</a>
       
     </div>
   
@@ -496,8 +385,8 @@ losses = []
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>论文解读——Denoising Diffusion Probability Model原理与代码分析</div>
-      <div>https://jiawei804.github.io/blog/2023/12/21/2023/12/21/DDPM/</div>
+      <div>无分类器指导——classifier-free guidance scale</div>
+      <div>https://jiawei804.github.io/blog/2023/12/23/2023/12/23/cfg/</div>
     </div>
     <div class="license-meta">
       
@@ -509,7 +398,7 @@ losses = []
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2023年12月21日</div>
+          <div>2023年12月23日</div>
         </div>
       
       
@@ -541,18 +430,12 @@ losses = []
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/blog/2023/12/23/2023/12/23/cfg/" title="无分类器指导——classifier-free guidance scale">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">无分类器指导——classifier-free guidance scale</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/blog/2023/12/19/2023/12/19/transformer/" title="论文解读——Attention is all you need（理解transformer原理及实现）">
-                        <span class="hidden-mobile">论文解读——Attention is all you need（理解transformer原理及实现）</span>
+                      <a href="/blog/2023/12/21/2023/12/21/DDPM/" title="论文解读——Denoising Diffusion Probability Model原理与代码分析">
+                        <span class="hidden-mobile">论文解读——Denoising Diffusion Probability Model原理与代码分析</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
