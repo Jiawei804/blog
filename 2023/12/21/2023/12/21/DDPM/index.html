@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://jiawei804.github.io/blog/images/2023/12-21.jpg">
 <meta property="article:published_time" content="2023-12-20T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-12-23T01:56:36.280Z">
+<meta property="article:modified_time" content="2023-12-23T02:51:28.561Z">
 <meta property="article:author" content="Zhang Jiawei">
 <meta property="article:tag" content="DeepLearning">
 <meta property="article:tag" content="Diffusion Model">
@@ -277,7 +277,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.5k 字
+          1.6k 字
         
       </span>
     
@@ -355,7 +355,7 @@
 <p>从时间步$t$到时间步$t-1$的单步反向“去噪”过程的数学表达式如下：<br>$$<br>p(x_{t-1}|x_t,x_0)&#x3D;\mathcal{N}(x_{t-1};\tilde{\mu}(x_t,x_0),\tilde{\beta}_tI)<br>$$</p>
 <p>UNet网络学习到的weights和bias就是反向过程的均值与方差（假设方差不固定需要学习，DDPM论文中固定了方差但在后续论文的改进中将其变为了可学习的参数），这涉及到了重参数化的思想，在这里简单介绍一下：</p>
 <p>正如 $p(x_{t-1}|x_t,x_0)$所示 ，我们要知道反向过程估计的复杂高斯分布$\mathcal{N}(x;\mu,\sigma)$ 的均值与方差，并在该分布下进行采样，而这样的采样是无法被神经网络所学习的。于是我们从简单高斯分布 $\mathcal{N}(x;0,1)$采样 $z$ ，假设参数 $w$和 $b$ 使得 $\mu$ 与 $\sigma$可以通过UNet网络对$w$ 和 $b$的学习来得到，这样随机性就只存在于$\mathcal{N}(x;0,1)$中，即：<br>$$<br>\mathcal{N}(x;\mu,\sigma)&#x3D;w*\mathcal{N}(x;0,1)+b<br>$$</p>
-<p>这就是<code>重参数化</code>，不过DDPM中固定了方差不变，只学习均值。</p>
+<p>这就是<code>重参数化</code>，不过DDPM中固定了方差不变，只学习均值。通过重参数化，$\epsilon_t\sim\mathcal{N}(0, I)$可以得到采样：<br>$$<br>x_t &#x3D; \sqrt{\tilde{\alpha}} x_0+\sqrt{1-\tilde{\alpha}} \epsilon_t<br>$$</p>
 <p>正是因为反向过程的每一步都是参数化的高斯分布，因此可以分别求高斯分布的均值和方差。通过推导，可以得到时间步$t-1$的高斯分布$q(x_{t-1}|x_t,x_0)$的均值与方差的数学表达式：<br>$$<br>\tilde{\beta}_t&#x3D;\frac{1-\bar{\alpha}_{t-1}}{1-\bar{\alpha}_t}·\beta_t<br>$$</p>
 <p>$$<br>\tilde{\mu}(x_t,x_0)&#x3D;\frac{\sqrt\alpha_t(1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_t}x_t+\frac{\sqrt{\bar{\alpha}_{t-1}}\beta_t}{1-\bar{\alpha}_t}x_0<br>$$</p>
 <p>则$x_{t-1}$的公式：<br>$$<br>x_{t-1}&#x3D;\frac{1}{\sqrt{\alpha}_t}(x_t-\frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}\epsilon)<br>$$</p>
