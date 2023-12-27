@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>论文解读——DiffFit|Unlocking Transferability of Large Diffusion Models via Simple Parameter-Efficient Fine-Tuning</title>
+    <link href="/blog/2023/12/28/2023/12/28/DiffFIT/"/>
+    <url>/blog/2023/12/28/2023/12/28/DiffFIT/</url>
+    
+    <content type="html"><![CDATA[<h1 id="论文解读——DiffFit-Unlocking-Transferability-of-Large-Diffusion-Models-via-Simple-Parameter-Efficient-Fine-Tuning"><a href="#论文解读——DiffFit-Unlocking-Transferability-of-Large-Diffusion-Models-via-Simple-Parameter-Efficient-Fine-Tuning" class="headerlink" title="论文解读——DiffFit: Unlocking Transferability of Large Diffusion Models via Simple Parameter-Efficient Fine-Tuning"></a>论文解读——DiffFit: Unlocking Transferability of Large Diffusion Models via Simple Parameter-Efficient Fine-Tuning</h1><blockquote><p>摘要：本文提出了一种高效的文本生成图像模型的微调方法，命名为DiffFIT，在8个下游数据集上的测试都优于现有的微调策略。本文的主要贡献：</p><p>1.提出了DiffFIT的微调方法，旨在已有预训练DiT模型参数的基础上，微调训练0.12%的参数，在下游数据集上取得了比以往微调方式高效的结果。</p><p>2.通过直观的理论分析以及设计的消融实验，表明为什么简单的参数高效微调可以快速适应新的分布。</p></blockquote><h2 id="参数微调方法"><a href="#参数微调方法" class="headerlink" title="参数微调方法"></a>参数微调方法</h2><h3 id="直接微调"><a href="#直接微调" class="headerlink" title="直接微调"></a>直接微调</h3><p>不改变模型结构的基础上 ，加载预训练模型并在有限的数据集上微调训练，通常选取更小的学习率，如全量微调，冻结等技术。</p><h3 id="适应性微调（Adaptive-Fine-Tuning）"><a href="#适应性微调（Adaptive-Fine-Tuning）" class="headerlink" title="适应性微调（Adaptive Fine-Tuning）"></a>适应性微调（Adaptive Fine-Tuning）</h3><p>通过增加一些小的结构，在预训练模型权重的基础上，微调小的结构上的参数， 而预训练参数全部冻结，通过这种方式调整模型的行为。如LoRA在自注意力子层之间的q和v结果中添加了两个低秩矩阵进行微调。</p><h3 id="提示微调（Prompt-Tuning）"><a href="#提示微调（Prompt-Tuning）" class="headerlink" title="提示微调（Prompt Tuning）"></a>提示微调（Prompt Tuning）</h3><p>P-Tuning在模型输入上调整输入序列的内容，加入一些可训练的提示或标志，以此来改善模型在有提示下的特定任务上的表现。</p><p>（后续或许会单独写一下这些微调方法，这里只说个概念）</p><h2 id="DiffFIT微调"><a href="#DiffFIT微调" class="headerlink" title="DiffFIT微调"></a>DiffFIT微调</h2><p>作者选取DiT（DiT-XL&#x2F;2）作为Baseline，DiT（Diffusion Transformer）是基于Transformer的扩散模型。DiffFIT旨在冻结模型所有参数，只训练Bais、Normalization、 class condition module 以及缩放因子$\gamma$。</p><figure>    <img src="DiffFIT.jpg" alt="DiffFIT" style="width:80%;">    <figcaption>图1: DiffFIT原理</figcaption></figure><p>算法流程如下：</p><figure>    <img src="DiffFIT1.jpg" alt="DiffFIT" style="width:80%;">    <figcaption>图2: DiffFIT算法实现</figcaption></figure><p>论文并没有太多原理性论述，作者通过大量的实验来证明以DiffFIT方式微调可以在下游数据集上得到更好的表现。</p><h2 id="实验部分"><a href="#实验部分" class="headerlink" title="实验部分"></a>实验部分</h2><p>实验所选用的基础模型是DiT-XL&#x2F;2，加载在ImageNet256×256上的预训练7B次的权重，所使用的学习率是1e-4对于全量微调，评估使用的无分类器引导（cfg）为1.5，cfg为4.0用于可视化。在提出的DiffFIT上学习率放大10倍进行参数高效微调。</p><h3 id="应用于下游数据集"><a href="#应用于下游数据集" class="headerlink" title="应用于下游数据集"></a>应用于下游数据集</h3><p>在Food101, SUN397, DF-20M mini, Caltech101, CUB-200-2011, ArtBench-10, Oxford Flowers and Stanford Cars 8个数据集上微调，并对比全量微调和其他微调方法，通过对比FID证明作者的微调方法更加高效。作者使用8张V100 GPUs，批大小设置为256，微调迭代240k次进行报告。</p><figure>    <img src="DiffFIT2.jpg" alt="DiffFIT" style="width:80%;">    <figcaption>图3: 下游数据集评测</figcaption></figure><p>尽管全量微调在3&#x2F;8的数据集上表现略好于DiffFIT，但是由于其必须更新所有参数，在时间成本上无法与DiffFIT相比。</p><h3 id="在ImageNet256×256预训练模型上微调-ImageNet-512-×-512数据集"><a href="#在ImageNet256×256预训练模型上微调-ImageNet-512-×-512数据集" class="headerlink" title="在ImageNet256×256预训练模型上微调 ImageNet 512 × 512数据集"></a>在ImageNet256×256预训练模型上微调 ImageNet 512 × 512数据集</h3><p>32个V100 GPUs，批大小1024并且迭代30k次，报告FID分数时采样步长为250。</p><figure>    <img src="DiffFIT3.jpg" alt="DiffFIT" style="width:80%;">    <figcaption>图4: ImageNet上的表现</figcaption></figure><p>从结果中可以看到DiffFIT微调得到了SOTA，FID值为3.02，且用更短的训练时间。</p><hr><p>之后作者加载预训练的IN256模型检查点在Food256上微调，并对比IN512的预训练模型上微调的结果，同时作者使用了设计的位置编码技巧作为对比。</p><figure>    <img src="DiffFIT5.jpg" alt="DiffFIT" style="width:80%;">    <figcaption>图5: 使用Food101对比所设计的位置编码</figcaption></figure><p>最终，作者发现利用预训练的 ImageNet 512×512 检查点所带来的 FID 性能与预训练的 256×256 的 ImageNet 所实现的性能相似。此外，作者观察到，通过将所提出的位置编码技巧纳入微调过程，FID 性能略有改善。</p><h2 id="收敛性分析"><a href="#收敛性分析" class="headerlink" title="收敛性分析"></a>收敛性分析</h2><p>在上述实验基础上，为了观察模型收敛情况，作者每15k次迭代计算FID分数。</p><figure>    <img src="DiffFIT6.jpg" alt="DiffFIT" style="width:80%;"></figure><p>从图中可以看到，其他微调方法与DiffFIT最终都能有相似的FID，但是DiFFFIT训练更加高效，所需要更新的参数更少（0.12%），更快收敛。</p><p>消融实验中，探索哪些部分的改进对结果有更大的影响。我更关注学习率，作者认为参数的高效微调需要比预训练更大的学习率，因为预训练已经在一定程度上初始化了模型的大部分参数，更大的学习率可以帮助快速适应剩余参数到新的任务。而在实验中作者发现比预训练大10倍的学习率可以产生最佳结果。</p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>DiffFIT是一种简单高效的微调方法。还是那句话，简单优雅的东西往往能产生令人意外的效果，曾经word2vec论文被ICLR拒稿，时隔十年，被NeurlIPS评为实践检验奖；LORA作者也曾以太过简单为由被拒稿。</p><figure>    <img src="DiffFIT7.jpg" alt="DiffFIT" style="width:80%;"></figure><p>“Most of the things really work is often just simple but elegant.”</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>论文解读</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Diffusion Model</tag>
+      
+      <tag>Efficient Training</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>论文解读——Scalable Diffusion Models with Transformers（DiT）</title>
     <link href="/blog/2023/12/27/2023/12/27/DiT/"/>
     <url>/blog/2023/12/27/2023/12/27/DiT/</url>
