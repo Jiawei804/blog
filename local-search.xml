@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>论文解读——Scalable Diffusion Models with Transformers（DiT）</title>
+    <link href="/blog/2023/12/27/2023/12/27/DiT/"/>
+    <url>/blog/2023/12/27/2023/12/27/DiT/</url>
+    
+    <content type="html"><![CDATA[<h1 id="论文解读——Scalable-Diffusion-Models-with-Transformers（DiT）"><a href="#论文解读——Scalable-Diffusion-Models-with-Transformers（DiT）" class="headerlink" title="论文解读——Scalable Diffusion Models with Transformers（DiT）"></a>论文解读——Scalable Diffusion Models with Transformers（DiT）</h1><p><code>ICCV2023</code></p><blockquote><p>摘要：本文是由meta研究人员提出的基于transformer架构的扩散模型，将主干网络（backbone）UNet替换为应用潜空间patches的transformer结构（参考了ViTs网络结构）。主要贡献如下：</p><p>1.全新的扩散模型结构，主干网络替换为transformer结构，并将新的扩散模型称之为DiT。</p><p>2.主要探索：条件模块设计中设计了四种变体、patch size、transformer block architecture、model size。</p></blockquote><h2 id="Diffusion-Transformers"><a href="#Diffusion-Transformers" class="headerlink" title="Diffusion Transformers"></a>Diffusion Transformers</h2><p>DiT的整体结构沿用了潜在扩散模型（LDM），其中VAE、Scheduler等结构并未发生改变，且在训练DiT中加载预训练的模型，在反向去噪过程中，所使用的主干网络UNet被替换为Transformer结构，关于Transformer应用于图像处理请参考ViT模型，DiT主干网络参考了很多ViT的最佳实践。</p><h2 id="四种变体（four-variants-of-transformer-blocks-that-process-conditional-inputs-differently）"><a href="#四种变体（four-variants-of-transformer-blocks-that-process-conditional-inputs-differently）" class="headerlink" title="四种变体（four variants of transformer blocks that process conditional inputs differently）"></a>四种变体（four variants of transformer blocks that process conditional inputs differently）</h2><h3 id="In-context-conditioning"><a href="#In-context-conditioning" class="headerlink" title="In-context conditioning"></a>In-context conditioning</h3><p>这种方式是指将条件信息转化为token直接与输入序列拼接，然后在送入模型训练，这种方式无需修改ViT的结构，使用标准ViT块就可以实现，在最后一个Transformer块之后删除条件信息。</p><figure>    <img src="DiT.jpg" alt="DiT" style="width:80%;">    <figcaption>图1: ViT图像输入</figcaption></figure><p>类似于上图，演示了将图片变成序列并嵌入类别标记。</p><h3 id="Cross-attention-block"><a href="#Cross-attention-block" class="headerlink" title="Cross-attention block"></a>Cross-attention block</h3><p>使用交叉注意力，当使用交叉注意力时，模型不需要将类别标记与时间标记等条件信息嵌入序列，而是把它们作为单独的序列，通过交叉注意力将二者合并。这样的方式条件信息的种类可以更丰富，但是同时也会为模型增加最大的计算量。</p><h3 id="Adaptive-layer-norm-adaLN-block"><a href="#Adaptive-layer-norm-adaLN-block" class="headerlink" title="Adaptive layer norm (adaLN) block."></a>Adaptive layer norm (adaLN) block.</h3><p>主要是说标准层归一化被adaLN取代，通过时间 $t$ 与类别标记 $c$ 的嵌入向量回归得到缩放因子与偏移因子。</p><h3 id="adaLN-Zero-block"><a href="#adaLN-Zero-block" class="headerlink" title="adaLN-Zero block"></a>adaLN-Zero block</h3><p>在UNet中，每个块的最后一个卷积层都会进行0初始化，在实践中发现这样的初始化有利于加速模型收敛，所以在DiT的结构中，作者也对adaLN的参相关参数（缩放因子与偏移因子）进行了0初始化。</p><p>模型的详细配置参考下图，划分出四种不同的模型大小。</p><figure>    <img src="DiT1.jpg" alt="DiT" style="width:80%;">    <figcaption>图2: DiT不同模型尺寸</figcaption></figure><h2 id="实验设置"><a href="#实验设置" class="headerlink" title="实验设置"></a>实验设置</h2><p>patches是指将图像按像素级分割，比如p&#x3D;2，图像尺寸为256×256，那么分割后的patches数量为(256&#x2F;&#x2F;2)×(256&#x2F;2)，DiT-XL&#x2F;2表示XLarge型号的模型，patch size是2×2。</p><figure>    <img src="DiT2.jpg" alt="DiT" style="width:80%;">    <figcaption>图3: DiT结构设计</figcaption></figure><p>在ImageNet 数据集 上以 256 × 256 和 512 × 512 图像分辨率上训练类条件潜在 DiT 模型，应用输出线性层0初始化，优化器使用adamW。学习率恒定，设置为1e-4，批量大小为256，唯一使用的数据增强是水平翻转。使用指数滑动平均（EMA）来处理模型权重，在评估阶段，全部使用EMA模型。此外，无其他系数的衰减。依然使用VAE将图像映射到隐空间，VAE加载现成的模型预训练参数，并在训练中保持不变。</p><h3 id="评估指标"><a href="#评估指标" class="headerlink" title="评估指标"></a>评估指标</h3><p>在评估时使用250个DDPM采样步骤报告FID-50K。</p><p>使用的是ADM的<a href="https://github.com/openai/guided-diffusion">tensorflow评估套件</a>。</p><h2 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h2><figure>    <img src="DiT3.jpg" alt="DiT" style="width:80%;">    <figcaption>图4: 4种条件策略对比</figcaption></figure><p>训练了四个最高Gflops的DiT-XL&#x2F;2 模型，每个模型都使用不同的块设计。四种条件策略下FID随训练步长的变化情况，可以看到应用adaLN-Zero的模型取得了最优的结果。对于后面所介绍的内容，所有模型都将使用 adaLN-Zero DiT 模块。</p><p>在model size（S、B、L、XL）以及patch size（8、4、2）的空间中缩放模型，作者观察到增加模型大小和减小patch大小可以显着改进扩散模型。</p><figure>    <img src="DiT4.jpg" alt="DiT" style="width:80%;">    <figcaption>图5</figcaption></figure><p>作者认为DiT的Gflops对于提高性能至关重要。图 6 的结果表明参数计数并不能唯一地确定 DiT 模型的质量。当模型大小保持不变并且补丁大小减小时，变压器的总参数实际上没有改变（实际上，总参数略有减少），并且仅 Gflops 增加。这些结果表明，缩放模型的Gflops 实际上是提高性能的关键。为了进一步研究这一点，作者在图 8 中针对模型 Gflops 绘制了 400K 训练步骤下的 FID-50K。结果表明，当总 Gflops 相似时，不同的 DiT 配置会获得相似的 FID 值（例如，DiT-S&#x2F;2 和 DiT- B&#x2F;4）。</p><figure>    <img src="DiT5.jpg" alt="DiT" style="width:80%;">    <figcaption>图6</figcaption></figure><figure>    <img src="DiT6.jpg" alt="DiT" style="width:80%;">    <figcaption>图7</figcaption></figure><p>作者在之后的实验中发现，更大的模型计算效率更高，相对于训练步数较少的大型 DiT 模型而言，小型 DiT 模型即使训练时间较长，最终也会变得计算效率低下。</p><p>之后作者使用最高Gflop的模型DiT-XL&#x2F;2，训练7M步，在ImageNet上达到了SOTA。</p><figure>    <img src="DiT7.jpg" alt="DiT" style="width:80%;">    <figcaption>图8</figcaption></figure><figure>    <img src="DiT8.jpg" alt="DiT" style="width:80%;">    <figcaption>图9</figcaption></figure><p>最后作者还测试了采样步长对于结果的影响。在400k训练步长上，使用[16,,32,64,128,256,1000]的采样步骤绘制FID曲线。</p><figure>    <img src="DiT9.jpg" alt="DiT" style="width:80%;">    <figcaption>图10</figcaption></figure><p>主要得到的结论是扩大采样步长并不能弥补模型计算量所带来的差距。</p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Diffusion Transformers (DiTs)，这是一种基于 Transformer 的简单扩散模型主干，其性能优于之前的 U-Net 模型，并继承了 Transformer 模型类出色的缩放特性。这将为后续的研究工作奠定基础，期待未来对于Transformer结构下扩散模型的探索。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>论文解读</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Diffusion Model</tag>
+      
+      <tag>Transformer</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>网络的渐进成长|Deep Growing Learning</title>
     <link href="/blog/2023/12/25/2023/12/25/dgl/"/>
     <url>/blog/2023/12/25/2023/12/25/dgl/</url>
@@ -102,6 +129,8 @@
     <tags>
       
       <tag>DeepLearning</tag>
+      
+      <tag>Transformer</tag>
       
     </tags>
     
