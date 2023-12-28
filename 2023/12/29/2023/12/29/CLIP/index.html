@@ -16,27 +16,27 @@
   <meta name="author" content="Zhang Jiawei">
   <meta name="keywords" content="">
   
-    <meta name="description" content="论文解读——DiffFit: Unlocking Transferability of Large Diffusion Models via Simple Parameter-Efficient Fine-Tuning 摘要：本文提出了一种高效的文本生成图像模型的微调方法，命名为DiffFIT，在8个下游数据集上的测试都优于现有的微调策略。本文的主要贡献： 1.提出了DiffFIT的微调方法，旨在">
+    <meta name="description" content="论文解读——CLIP|Learning Transferable Visual Models From Natural Language Supervision 摘要：本篇论文是OpenAI在多模态领域的成果之一，CLIP（Contrastive LanguageImage Pre-training）连接了文本和图像，旨在将同一语义的文字和图片转化到同一个隐空间下。论文主要贡献： 1.论文使用在互">
 <meta property="og:type" content="article">
-<meta property="og:title" content="论文解读——DiffFit|Unlocking Transferability of Large Diffusion Models via Simple Parameter-Efficient Fine-Tuning">
-<meta property="og:url" content="https://jiawei804.github.io/blog/2023/12/28/2023/12/28/DiffFIT/index.html">
+<meta property="og:title" content="论文解读——CLIP|Learning Transferable Visual Models From Natural Language Supervision">
+<meta property="og:url" content="https://jiawei804.github.io/blog/2023/12/29/2023/12/29/CLIP/index.html">
 <meta property="og:site_name" content="Jiawei&#39;s Blog">
-<meta property="og:description" content="论文解读——DiffFit: Unlocking Transferability of Large Diffusion Models via Simple Parameter-Efficient Fine-Tuning 摘要：本文提出了一种高效的文本生成图像模型的微调方法，命名为DiffFIT，在8个下游数据集上的测试都优于现有的微调策略。本文的主要贡献： 1.提出了DiffFIT的微调方法，旨在">
+<meta property="og:description" content="论文解读——CLIP|Learning Transferable Visual Models From Natural Language Supervision 摘要：本篇论文是OpenAI在多模态领域的成果之一，CLIP（Contrastive LanguageImage Pre-training）连接了文本和图像，旨在将同一语义的文字和图片转化到同一个隐空间下。论文主要贡献： 1.论文使用在互">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://jiawei804.github.io/blog/images/2023/12-28.jpg">
-<meta property="article:published_time" content="2023-12-27T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-12-27T13:15:34.486Z">
+<meta property="og:image" content="https://jiawei804.github.io/blog/images/2023/12-29.jpg">
+<meta property="article:published_time" content="2023-12-28T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-28T03:38:09.730Z">
 <meta property="article:author" content="Zhang Jiawei">
-<meta property="article:tag" content="Diffusion Model">
-<meta property="article:tag" content="Efficient Training">
+<meta property="article:tag" content="zero-shot">
+<meta property="article:tag" content="transfer learning">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://jiawei804.github.io/blog/images/2023/12-28.jpg">
+<meta name="twitter:image" content="https://jiawei804.github.io/blog/images/2023/12-29.jpg">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
   
   
-  <title>论文解读——DiffFit|Unlocking Transferability of Large Diffusion Models via Simple Parameter-Efficient Fine-Tuning - Jiawei&#39;s Blog</title>
+  <title>论文解读——CLIP|Learning Transferable Visual Models From Natural Language Supervision - Jiawei&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -280,13 +280,13 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('/blog/images/2023/12-28-cover.jpg') no-repeat center center; background-size: cover;">
+     style="background: url('/blog/images/2023/12-29-cover.jpg') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="论文解读——DiffFit|Unlocking Transferability of Large Diffusion Models via Simple Parameter-Efficient Fine-Tuning"></span>
+            <span id="subtitle" data-typed-text="论文解读——CLIP|Learning Transferable Visual Models From Natural Language Supervision"></span>
           
         </div>
 
@@ -297,8 +297,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-12-28 00:00" pubdate>
-          2023年12月28日 凌晨
+        <time datetime="2023-12-29 00:00" pubdate>
+          2023年12月29日 凌晨
         </time>
       </span>
     
@@ -309,7 +309,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.1k 字
+          1.8k 字
         
       </span>
     
@@ -320,7 +320,7 @@
         
         
         
-          10 分钟
+          15 分钟
         
       </span>
     
@@ -357,73 +357,68 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">论文解读——DiffFit|Unlocking Transferability of Large Diffusion Models via Simple Parameter-Efficient Fine-Tuning</h1>
+            <h1 id="seo-header">论文解读——CLIP|Learning Transferable Visual Models From Natural Language Supervision</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="论文解读——DiffFit-Unlocking-Transferability-of-Large-Diffusion-Models-via-Simple-Parameter-Efficient-Fine-Tuning"><a href="#论文解读——DiffFit-Unlocking-Transferability-of-Large-Diffusion-Models-via-Simple-Parameter-Efficient-Fine-Tuning" class="headerlink" title="论文解读——DiffFit: Unlocking Transferability of Large Diffusion Models via Simple Parameter-Efficient Fine-Tuning"></a>论文解读——DiffFit: Unlocking Transferability of Large Diffusion Models via Simple Parameter-Efficient Fine-Tuning</h1><blockquote>
-<p>摘要：本文提出了一种高效的文本生成图像模型的微调方法，命名为DiffFIT，在8个下游数据集上的测试都优于现有的微调策略。本文的主要贡献：</p>
-<p>1.提出了DiffFIT的微调方法，旨在已有预训练DiT模型参数的基础上，微调训练0.12%的参数，在下游数据集上取得了比以往微调方式高效的结果。</p>
-<p>2.通过直观的理论分析以及设计的消融实验，表明为什么简单的参数高效微调可以快速适应新的分布。</p>
+                <h1 id="论文解读——CLIP-Learning-Transferable-Visual-Models-From-Natural-Language-Supervision"><a href="#论文解读——CLIP-Learning-Transferable-Visual-Models-From-Natural-Language-Supervision" class="headerlink" title="论文解读——CLIP|Learning Transferable Visual Models From Natural Language Supervision"></a>论文解读——CLIP|Learning Transferable Visual Models From Natural Language Supervision</h1><blockquote>
+<p>摘要：本篇论文是OpenAI在多模态领域的成果之一，CLIP（Contrastive LanguageImage Pre-training）连接了文本和图像，旨在将同一语义的文字和图片转化到同一个隐空间下。论文主要贡献：</p>
+<p>1.论文使用在互联网上收集的4亿个图像文本对的数据集从头训练一个模型，这种预测标题（文本）与图像的对应的预训练更像是一种广泛的监督学习，高效且可扩展。</p>
+<p>2.在预训练好的模型上，能够实现zero-shot学习应用于下游任务。例如，在 ImageNet 零样本上可以媲美原始 ResNet50 的准确性（分类任务），而无需使用其所训练的 128 万个训练样本中的任何一个。</p>
+<p>3.CLIP推动了基于文字引导的文字生成图像技术在图像生成领域的快速发展，是后续DALLE、Imagen、stable diffusion的基石。</p>
 </blockquote>
-<h2 id="参数微调方法"><a href="#参数微调方法" class="headerlink" title="参数微调方法"></a>参数微调方法</h2><h3 id="直接微调"><a href="#直接微调" class="headerlink" title="直接微调"></a>直接微调</h3><p>不改变模型结构的基础上 ，加载预训练模型并在有限的数据集上微调训练，通常选取更小的学习率，如全量微调，冻结等技术。</p>
-<h3 id="适应性微调（Adaptive-Fine-Tuning）"><a href="#适应性微调（Adaptive-Fine-Tuning）" class="headerlink" title="适应性微调（Adaptive Fine-Tuning）"></a>适应性微调（Adaptive Fine-Tuning）</h3><p>通过增加一些小的结构，在预训练模型权重的基础上，微调小的结构上的参数， 而预训练参数全部冻结，通过这种方式调整模型的行为。如LoRA在自注意力子层之间的q和v结果中添加了两个低秩矩阵进行微调。</p>
-<h3 id="提示微调（Prompt-Tuning）"><a href="#提示微调（Prompt-Tuning）" class="headerlink" title="提示微调（Prompt Tuning）"></a>提示微调（Prompt Tuning）</h3><p>P-Tuning在模型输入上调整输入序列的内容，加入一些可训练的提示或标志，以此来改善模型在有提示下的特定任务上的表现。</p>
-<p>（后续或许会单独写一下这些微调方法，这里只说个概念）</p>
-<h2 id="DiffFIT微调"><a href="#DiffFIT微调" class="headerlink" title="DiffFIT微调"></a>DiffFIT微调</h2><p>作者选取DiT（DiT-XL&#x2F;2）作为Baseline，DiT（Diffusion Transformer）是基于Transformer的扩散模型。DiffFIT旨在冻结模型所有参数，只训练Bais、Normalization、 class condition module 以及缩放因子$\gamma$。</p>
+<h2 id="CLIP如何将图像与文本映射到同一潜空间？"><a href="#CLIP如何将图像与文本映射到同一潜空间？" class="headerlink" title="CLIP如何将图像与文本映射到同一潜空间？"></a>CLIP如何将图像与文本映射到同一潜空间？</h2><p>在最开始，作者模仿之前类似的工作，通过训练一个图像CNN和一个文本Transformer来预测图像标题，但是很难继续扩展研究，并且Transformer模型的计算量已经是原始ResNet50的两倍之多。</p>
+<p>随后作者受到表示学习的研究启发，考虑探索一个系统能够预测文本与图像两个整体的对应关系而不是文本的确切单词与图像的对应。事实证明，这样的方式效率提升了4倍。</p>
+<p>随后，作者设计了一种训练方式：给定N个（img，text），CLIP被训练并预测在N×N种组合中哪一种实际发生。</p>
+<p>为了达到这个目标，作者使用了一个图像编码器（image encoder）和一个文本编码器（text encoder），如下图。</p>
 <figure>
-    <img src="DiffFIT.jpg" srcset="/blog/img/loading.gif" lazyload alt="DiffFIT" style="width:80%;">
-    <figcaption>图1: DiffFIT原理</figcaption>
+    <img src="CLIP1.jpg" srcset="/blog/img/loading.gif" lazyload alt="CLIP" style="width:80%;">
+    <figcaption>图1: （text,image) encoder</figcaption>
+</figure>
+
+<p>之后，将图像和文本转化为embedding并最大化$N$个真实配对的图像文本之间的余弦相似度，同时最小化$N^2-N$个不正确配对的图像文本之间的余弦相似度。优化目标是这些相似性分数的平均交叉熵损失。</p>
+<p>下面的伪代码先将图像文本转化为嵌入向量，之后分别计算了图像的交叉熵和文本的交叉熵，损失取二者的平均。</p>
+<figure>
+    <img src="CLIP2.jpg" srcset="/blog/img/loading.gif" lazyload alt="CLIP" style="width:80%;">
+    <figcaption>图2: 计算余弦相似度</figcaption>
+</figure>
+
+<p>值得一提的是，训练过程的唯一数据增强是对Resized的图像进行随机方形裁剪。对于Softmax中控制对数范围的温度参数$\tau$将其转化为了对数参数化的乘法标量避免其作为超参数。</p>
+<h2 id="CLIP模型结构设计"><a href="#CLIP模型结构设计" class="headerlink" title="CLIP模型结构设计"></a>CLIP模型结构设计</h2><p>对于图像编码器，作者考虑了两种主流架构。第一种是使用ResNet50（有所修改），将全局平均池化替换为注意力池化机制，注意力池化层只使用一个简单的Transformer样式的多头QKV（query、key、value）注意力，query是图像的全局平均池化表示。第二种是ViT（Vision Transformer），在此模型上作者只做了微小修改，在Transformer输入之前的combined patch和position embedding后加了一个额外的归一化层，以及不同的初始化模型权重的方法。对于文本编码器，作者使用12层宽度为512的8头注意力Transformer。CLIP的整体表现对文本编码器并不敏感。</p>
+<h2 id="CLIP应用"><a href="#CLIP应用" class="headerlink" title="CLIP应用"></a>CLIP应用</h2><p>用预训练好的CLIP在下游数据集上测试其零样本迁移学习的能力。对于每一个数据集，使用每个类的名字构造出文本，过程如下。</p>
+<figure>
+    <img src="CLIP3.jpg" srcset="/blog/img/loading.gif" lazyload alt="CLIP" style="width:80%;">
+    <figcaption>图3: 应用于下游数据集</figcaption>
 </figure>
 
 
-<p>算法流程如下：</p>
-<figure>
-    <img src="DiffFIT1.jpg" srcset="/blog/img/loading.gif" lazyload alt="DiffFIT" style="width:80%;">
-    <figcaption>图2: DiffFIT算法实现</figcaption>
-</figure>
 
-<p>论文并没有太多原理性论述，作者通过大量的实验来证明以DiffFIT方式微调可以在下游数据集上得到更好的表现。</p>
-<h2 id="实验部分"><a href="#实验部分" class="headerlink" title="实验部分"></a>实验部分</h2><p>实验所选用的基础模型是DiT-XL&#x2F;2，加载在ImageNet256×256上的预训练7B次的权重，所使用的学习率是1e-4对于全量微调，评估使用的无分类器引导（cfg）为1.5，cfg为4.0用于可视化。在提出的DiffFIT上学习率放大10倍进行参数高效微调。</p>
-<h3 id="应用于下游数据集"><a href="#应用于下游数据集" class="headerlink" title="应用于下游数据集"></a>应用于下游数据集</h3><p>在Food101, SUN397, DF-20M mini, Caltech101, CUB-200-2011, ArtBench-10, Oxford Flowers and Stanford Cars 8个数据集上微调，并对比全量微调和其他微调方法，通过对比FID证明作者的微调方法更加高效。作者使用8张V100 GPUs，批大小设置为256，微调迭代240k次进行报告。</p>
+<p>在27个下游数据集上评估，CLIP的零样本分类能力与标准ResNet50的完全监督线性分类器（指最后分类任务使用logistic还是linear）对比，发现在16个数据集上CLIP的表现都更加优秀，其中包括ImageNet。</p>
 <figure>
-    <img src="DiffFIT2.jpg" srcset="/blog/img/loading.gif" lazyload alt="DiffFIT" style="width:80%;">
-    <figcaption>图3: 下游数据集评测</figcaption>
-</figure>
-
-<p>尽管全量微调在3&#x2F;8的数据集上表现略好于DiffFIT，但是由于其必须更新所有参数，在时间成本上无法与DiffFIT相比。</p>
-<h3 id="在ImageNet256×256预训练模型上微调-ImageNet-512-×-512数据集"><a href="#在ImageNet256×256预训练模型上微调-ImageNet-512-×-512数据集" class="headerlink" title="在ImageNet256×256预训练模型上微调 ImageNet 512 × 512数据集"></a>在ImageNet256×256预训练模型上微调 ImageNet 512 × 512数据集</h3><p>32个V100 GPUs，批大小1024并且迭代30k次，报告FID分数时采样步长为250。</p>
-<figure>
-    <img src="DiffFIT3.jpg" srcset="/blog/img/loading.gif" lazyload alt="DiffFIT" style="width:80%;">
-    <figcaption>图4: ImageNet上的表现</figcaption>
-</figure>
-
-<p>从结果中可以看到DiffFIT微调得到了SOTA，FID值为3.02，且用更短的训练时间。</p>
-<hr>
-<p>之后作者加载预训练的IN256模型检查点在Food256上微调，并对比IN512的预训练模型上微调的结果，同时作者使用了设计的位置编码技巧作为对比。</p>
-<figure>
-    <img src="DiffFIT5.jpg" srcset="/blog/img/loading.gif" lazyload alt="DiffFIT" style="width:80%;">
-    <figcaption>图5: 使用Food101对比所设计的位置编码</figcaption>
+    <img src="CLIP4.jpg" srcset="/blog/img/loading.gif" lazyload alt="CLIP" style="width:80%;">
+    <figcaption>图4</figcaption>
 </figure>
 
 
-<p>最终，作者发现利用预训练的 ImageNet 512×512 检查点所带来的 FID 性能与预训练的 256×256 的 ImageNet 所实现的性能相似。此外，作者观察到，通过将所提出的位置编码技巧纳入微调过程，FID 性能略有改善。</p>
-<h2 id="收敛性分析"><a href="#收敛性分析" class="headerlink" title="收敛性分析"></a>收敛性分析</h2><p>在上述实验基础上，为了观察模型收敛情况，作者每15k次迭代计算FID分数。</p>
-<figure>
-    <img src="DiffFIT6.jpg" srcset="/blog/img/loading.gif" lazyload alt="DiffFIT" style="width:80%;">
-
-</figure>
-
-
-<p>从图中可以看到，其他微调方法与DiffFIT最终都能有相似的FID，但是DiFFFIT训练更加高效，所需要更新的参数更少（0.12%），更快收敛。</p>
-<p>消融实验中，探索哪些部分的改进对结果有更大的影响。我更关注学习率，作者认为参数的高效微调需要比预训练更大的学习率，因为预训练已经在一定程度上初始化了模型的大部分参数，更大的学习率可以帮助快速适应剩余参数到新的任务。而在实验中作者发现比预训练大10倍的学习率可以产生最佳结果。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>DiffFIT是一种简单高效的微调方法。还是那句话，简单优雅的东西往往能产生令人意外的效果，曾经word2vec论文被ICLR拒稿，时隔十年，被NeurlIPS评为实践检验奖；LORA作者也曾以太过简单为由被拒稿。</p>
-<figure>
-    <img src="DiffFIT7.jpg" srcset="/blog/img/loading.gif" lazyload alt="DiffFIT" style="width:80%;">
-</figure>
-
-<p>“Most of the things really work is often just simple but elegant.”</p>
+<p>在STL10数据集上作者发现CLIP可以得到SOTA性能（99.3%），而在细粒度数据集上，其中Food101和Stanford Cars上的CLIP性能比使用逻辑回归的ResNet50超过20%，而在Flowers 102和FGVCAircraft上，zero-shot CLIP的表现则低于10%以上。</p>
+<p>Zero-shot CLIP在两个测量视频动作识别的数据集上的表现明显优于ResNet 50。在Kinetics 700上，CLIP的表现比ResNet 50高出14.5%。Zero-shot CLIP在UCF 101上的表现也比ResNet 50高出7.7%。作者推测CLIP能够从文本中提取更多的动态语义而分类只是名词（单个单词）。</p>
+<p>Zero-shot CLIP在面对专门的、复杂的或抽象的任务时表现欠佳。例如卫星图像分类（EuroSAT和RESISC 45）、淋巴结肿瘤检测（PatchCamelyon）、计算合成场景中的物体（CLEVRCounts），以及自动驾驶相关任务，例如德国交通标志识别（GTSRB）、识别与最近汽车的距离（KITTI Distance）。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>论文中还有一些其他相关介绍和工作。CLIP尽管能够与ResNet-50的baseline竞争，但这并不是意味着它达到了SOTA，所以后续仍然有大量的工作需要进行来改进CLIP的任务学习能力与迁移学习能力。</p>
+<p>聊一聊对于文本生成图像的贡献。实际上，通过文本引导图像生成的概念并非首次出现在CLIP中。在CLIP之前，就已经有研究工作在探索这一领域，例如 GAN（生成对抗网络）相关的研究，2014 年的条件GAN（Conditional GAN）和后续的文本到图像的生成模型。CLIP，由OpenAI在2021年提出，并且它对于这个领域的贡献显著。</p>
+<ul>
+<li><p>强大的跨模态理解<br>CLIP通过在大规模数据集上预训练来学习图像和文本之间的关联。这使得它能够理解和捕捉到丰富的、多样化的视觉概念和语言描述之间的关系。</p>
+</li>
+<li><p>零样本学习能力<br>CLIP展示了出色的零样本学习能力，即在没有看过特定任务的训练样本的情况下，它仍能执行该任务。这意味着CLIP可以理解并响应以前未见过的文本描述，生成或识别与之相关的图像内容。</p>
+</li>
+<li><p>开辟新应用<br>CLIP的出现推动了一系列新的应用和研究，例如基于文本的图像搜索、内容创建和图像理解等。它为后续的文本到图像的生成模型（如DALL·E）铺平了道路，这些模型能够更直接地将文本描述转换为图像。</p>
+</li>
+<li><p>新的研究方向<br>CLIP的设计和成功推动了对跨模态（如文本和图像）学习和表示的进一步研究。它展示了通过对齐和联合训练两种不同类型的数据（图像和文本）来构建更为强大和通用的模型的潜力。</p>
+</li>
+<li><p>高效的标注效率<br>传统上，许多机器学习模型依赖大量标注的数据。CLIP通过学习直接从自然语言描述中获取监督信息，显示了减少对手工标注数据依赖的可能性。</p>
+</li>
+</ul>
+<p>总而言之，虽然CLIP不是第一个文本引导图像生成的项目，但它在理解跨模态关系、零样本学习、以及推动文本到图像生成领域的发展方面做出了重要的贡献。</p>
 
                 
               </div>
@@ -457,9 +452,9 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/blog/tags/Diffusion-Model/" class="print-no-link">#Diffusion Model</a>
+        <a href="/blog/tags/zero-shot/" class="print-no-link">#zero-shot</a>
       
-        <a href="/blog/tags/Efficient-Training/" class="print-no-link">#Efficient Training</a>
+        <a href="/blog/tags/transfer-learning/" class="print-no-link">#transfer learning</a>
       
     </div>
   
@@ -471,8 +466,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>论文解读——DiffFit|Unlocking Transferability of Large Diffusion Models via Simple Parameter-Efficient Fine-Tuning</div>
-      <div>https://jiawei804.github.io/blog/2023/12/28/2023/12/28/DiffFIT/</div>
+      <div>论文解读——CLIP|Learning Transferable Visual Models From Natural Language Supervision</div>
+      <div>https://jiawei804.github.io/blog/2023/12/29/2023/12/29/CLIP/</div>
     </div>
     <div class="license-meta">
       
@@ -484,7 +479,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2023年12月28日</div>
+          <div>2023年12月29日</div>
         </div>
       
       
@@ -516,18 +511,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/blog/2023/12/29/2023/12/29/CLIP/" title="论文解读——CLIP|Learning Transferable Visual Models From Natural Language Supervision">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">论文解读——CLIP|Learning Transferable Visual Models From Natural Language Supervision</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/blog/2023/12/27/2023/12/27/DiT/" title="论文解读——Scalable Diffusion Models with Transformers（DiT）">
-                        <span class="hidden-mobile">论文解读——Scalable Diffusion Models with Transformers（DiT）</span>
+                      <a href="/blog/2023/12/28/2023/12/28/DiffFIT/" title="论文解读——DiffFit|Unlocking Transferability of Large Diffusion Models via Simple Parameter-Efficient Fine-Tuning">
+                        <span class="hidden-mobile">论文解读——DiffFit|Unlocking Transferability of Large Diffusion Models via Simple Parameter-Efficient Fine-Tuning</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
