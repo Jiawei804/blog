@@ -1,0 +1,943 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/images/fluid.png">
+  <link rel="icon" href="/blog/images/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#93b5cf">
+  <meta name="author" content="Zhang Jiawei">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="论文解读——Denoising Diffusion Probability Model原理与代码分析neurips2020  摘要：使用扩散模型生成高质量图像，扩散概率模型和朗之万动力学的去噪分数匹配之间的联系设计的加权变分界进行训练来获得最佳结果，在学术界被认为是最早的扩散模型，尽管2015年Jascha Sohl-Dickstein等人已经提出了扩散概率模型。 论文主要贡献： 1.作者证明了扩">
+<meta property="og:type" content="article">
+<meta property="og:title" content="论文解读——Denoising Diffusion Probability Model原理与代码分析">
+<meta property="og:url" content="https://jiawei804.github.io/blog/2023/12/21/2023/12/21/DDPM/index.html">
+<meta property="og:site_name" content="Jiawei&#39;s Blog">
+<meta property="og:description" content="论文解读——Denoising Diffusion Probability Model原理与代码分析neurips2020  摘要：使用扩散模型生成高质量图像，扩散概率模型和朗之万动力学的去噪分数匹配之间的联系设计的加权变分界进行训练来获得最佳结果，在学术界被认为是最早的扩散模型，尽管2015年Jascha Sohl-Dickstein等人已经提出了扩散概率模型。 论文主要贡献： 1.作者证明了扩">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://jiawei804.github.io/blog/images/2023/12-21.jpg">
+<meta property="article:published_time" content="2023-12-20T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-23T02:51:28.561Z">
+<meta property="article:author" content="Zhang Jiawei">
+<meta property="article:tag" content="DeepLearning">
+<meta property="article:tag" content="Diffusion Model">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://jiawei804.github.io/blog/images/2023/12-21.jpg">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>论文解读——Denoising Diffusion Probability Model原理与代码分析 - Jiawei&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/blog/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/blog/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/blog/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"jiawei804.github.io","root":"/blog/","version":"1.9.6","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":"4016bcd321494fdaa4814573925fc604","google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/blog/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+  
+
+  
+    <!-- Baidu Analytics -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?4016bcd321494fdaa4814573925fc604";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+      }
+    </script>
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/blog/">
+      <strong>jiaweijson</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="iconfont icon-link-fill"></i>
+                <span>链接</span>
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="https://jiawei804.github.io/homepage/" target="_self">
+                    
+                    <span>学术主页</span>
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="https://500px.com.cn/JiaweiZhang/" target="_self">
+                    
+                    <span>摄影</span>
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/blog/images/2023/12-21-cover.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="论文解读——Denoising Diffusion Probability Model原理与代码分析"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-12-21 00:00" pubdate>
+          2023年12月21日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          13 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">论文解读——Denoising Diffusion Probability Model原理与代码分析</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="论文解读——Denoising-Diffusion-Probability-Model原理与代码分析"><a href="#论文解读——Denoising-Diffusion-Probability-Model原理与代码分析" class="headerlink" title="论文解读——Denoising Diffusion Probability Model原理与代码分析"></a>论文解读——Denoising Diffusion Probability Model原理与代码分析</h1><p><code>neurips2020</code></p>
+<blockquote>
+<p>摘要：使用扩散模型生成高质量图像，扩散概率模型和朗之万动力学的去噪分数匹配之间的联系设计的加权变分界进行训练来获得最佳结果，在学术界被认为是最早的扩散模型，尽管2015年Jascha Sohl-Dickstein等人已经提出了扩散概率模型。</p>
+<p>论文主要贡献：</p>
+<p>1.作者证明了扩散模型能够生成高质量图像样本。</p>
+<p>2.在假设马尔可夫过程的前提下，作者发现了扩散模型 与变分推理之间的联系，使得可以训练一个优秀的神经网络来生成高质量样本。</p>
+</blockquote>
+<h2 id="DDPM原理"><a href="#DDPM原理" class="headerlink" title="DDPM原理"></a>DDPM原理</h2><p>扩散模型（Diffusion Model）是一种基于物理热力学扩散思想的深度学习生成模型，包括前向扩散和反向扩散两个过程。不太懂的朋友，不妨想象一下，一滴墨水滴入盛满水的杯中逐渐扩散到整个系统的情景。非平衡热力学描述这滴墨水随时间推移的扩散过程中每一个“时间步”状态的概率分布——从一个初始的复杂概率分布逐步扩散变成简单均匀的分布。如果可以反向求出这个过程，那么就可以从简单分布中推导复杂分布。说起扩散模型，甚至可以追溯一下它的前辈——VAE（变分自编码器）和GAN（生成对抗网络），不过这不在本文的讨论范围。</p>
+<p>公认最早的扩散模型DDPM（Denoising Diffusion Probabilistic Model），假设了扩散过程是一个马尔可夫过程（每一个时间步的状态仅有上一个时间步状态的概率分布加上当前时间步的高斯噪声得到），以及扩散过程的逆过程是高斯分布等。</p>
+<p>DDPM的收敛速度与马尔可夫时间步长和样本空间大小（resolution和sample size）成正比。在DDPM中，逆向过程近似于前向过程中添加的高斯噪声；需要迭代所有数千个时间步才能生成一个样本批次。</p>
+<figure>
+    <img src="DDPM.png" srcset="/blog/img/loading.gif" lazyload alt="DDPM" style="width:100%;">
+    <figcaption>图1: DDPM过程</figcaption>
+</figure>
+
+
+<p>如图1所示，$x_0$到$x_T$是对数据进行加噪的前向过程，DDPM假设了扩散过程是一个马尔可夫过程（每一个时间步的概率分布仅由上一个时间步状态的概率分布加上当前时间步的高斯噪声得到）。时间步$t-1$到时间步$t$的单步加噪过程的数学表达式如下：<br>$$<br>q(x_t|x_{t-1})&#x3D;\mathcal{N}(x_t; \sqrt{1-\beta_t}x_{t-1}, \beta_tI)<br>$$</p>
+<p>噪声的方差是一个位于区间$(0,1)$的固定值$\beta_t$确定，均值则由固定值$\beta_t$和当前时刻“带噪”的数据分布确定。</p>
+<p>最终的噪声分布数学表达式如下：<br>$$<br>q(x_{1:T}|x_0)&#x3D;\prod_{t&#x3D;1}^{T}q(x_t|x_{t-1})<br>$$</p>
+<p>设 $\alpha_t:&#x3D;1-\beta_t$，$\bar{\alpha}_{t}:&#x3D;\prod_{s&#x3D;1}^{t}\alpha_s$，则有：<br>$$<br>q(x_t|x_0)&#x3D;\mathcal{N}(x_t;\sqrt{\bar{\alpha}_t}x_0,(1-\bar{\alpha}_t)I)<br>$$</p>
+<p>$x_t$的公式则为：<br>$$<br>x_t(x_0,\epsilon)&#x3D;\sqrt{\bar{\alpha}_t}x_0+\sqrt{1-\bar{\alpha}_t}\epsilon<br>$$</p>
+<p>前向过程是将数据噪声化的过程，前向过程的逆过程（反向过程）则是“去噪”的过程，即从随机噪声中迭代恢复出清晰数据的过程。DDPM将反向过程也视为一个马尔可夫链，这个马尔科夫链是由一系列神经网络参数化的高斯分布组成，也就是需要训练的扩散模型UNet。</p>
+<p>从时间步$t$到时间步$t-1$的单步反向“去噪”过程的数学表达式如下：<br>$$<br>p(x_{t-1}|x_t,x_0)&#x3D;\mathcal{N}(x_{t-1};\tilde{\mu}(x_t,x_0),\tilde{\beta}_tI)<br>$$</p>
+<p>UNet网络学习到的weights和bias就是反向过程的均值与方差（假设方差不固定需要学习，DDPM论文中固定了方差但在后续论文的改进中将其变为了可学习的参数），这涉及到了重参数化的思想，在这里简单介绍一下：</p>
+<p>正如 $p(x_{t-1}|x_t,x_0)$所示 ，我们要知道反向过程估计的复杂高斯分布$\mathcal{N}(x;\mu,\sigma)$ 的均值与方差，并在该分布下进行采样，而这样的采样是无法被神经网络所学习的。于是我们从简单高斯分布 $\mathcal{N}(x;0,1)$采样 $z$ ，假设参数 $w$和 $b$ 使得 $\mu$ 与 $\sigma$可以通过UNet网络对$w$ 和 $b$的学习来得到，这样随机性就只存在于$\mathcal{N}(x;0,1)$中，即：<br>$$<br>\mathcal{N}(x;\mu,\sigma)&#x3D;w*\mathcal{N}(x;0,1)+b<br>$$</p>
+<p>这就是<code>重参数化</code>，不过DDPM中固定了方差不变，只学习均值。通过重参数化，$\epsilon_t\sim\mathcal{N}(0, I)$可以得到采样：<br>$$<br>x_t &#x3D; \sqrt{\tilde{\alpha}} x_0+\sqrt{1-\tilde{\alpha}} \epsilon_t<br>$$</p>
+<p>正是因为反向过程的每一步都是参数化的高斯分布，因此可以分别求高斯分布的均值和方差。通过推导，可以得到时间步$t-1$的高斯分布$q(x_{t-1}|x_t,x_0)$的均值与方差的数学表达式：<br>$$<br>\tilde{\beta}_t&#x3D;\frac{1-\bar{\alpha}_{t-1}}{1-\bar{\alpha}_t}·\beta_t<br>$$</p>
+<p>$$<br>\tilde{\mu}(x_t,x_0)&#x3D;\frac{\sqrt\alpha_t(1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_t}x_t+\frac{\sqrt{\bar{\alpha}_{t-1}}\beta_t}{1-\bar{\alpha}_t}x_0<br>$$</p>
+<p>则$x_{t-1}$的公式：<br>$$<br>x_{t-1}&#x3D;\frac{1}{\sqrt{\alpha}_t}(x_t-\frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}\epsilon)<br>$$</p>
+<p>扩散模型的优化目标数学表达式：<br>$$<br>L^{simple}_{t-1}&#x3D;E_{x_0,\epsilon\sim\mathcal{N}(0,I)}[||\epsilon-\epsilon_\theta(x_t,t)||^2]<br>$$</p>
+<p>在DDIM论文中损失做了一些调整（如下）。现在的扩散模型几乎都采用了DDIM提出了新的采样方式（而非像DDPM一样的马尔可夫过程每一步的采样都依赖上一步的结果），这样的好处是大大提高了采样的效率，之后可能会写一篇关于DDIM的分析。<br>$$<br>\mathcal{L}_{final}&#x3D;\mathcal{L}_{mse}+\lambda\mathcal{L}_{vlb}<br>$$</p>
+<h2 id="扩散过程"><a href="#扩散过程" class="headerlink" title="扩散过程"></a>扩散过程</h2><figure>
+    <img src="DDPM1.jpg" srcset="/blog/img/loading.gif" lazyload alt="DDPM" style="width:80%;">
+    <figcaption>图2: 扩散原理</figcaption>
+</figure>
+
+
+<p>一个简单的扩散模型工作的示意图，将输入数据$Z$不断添加高斯噪声，即Diffusion Process来生成带噪数据$Z_T$，之后通过U-Net网络。</p>
+<p>使用U-Net网络你有两种选择，一种是直接预测最后的结果，一种是进行噪声的预测（Diffusers库中实现通过对噪声预测）。根据DIT论文中的表述，DDPM可能选择了对图像（Improvements in DDPMs over the past two years have largely been driven by improved sampling techniques, most notably classifierfree guidance, reformulating diffusion models to predict noise instead of pixels [DDPM] and using cascaded DDPM pipelines where low-resolution base diffusion models are trained in parallel with upsamplers）的预测，此后的研究改进并通过UNet预测噪声来优化网络参数。</p>
+<figure>
+    <img src="DDPM2.jpg" srcset="/blog/img/loading.gif" lazyload alt="DDPM" style="width:120%;">
+    <figcaption>图3: 算法流程</figcaption>
+</figure>
+
+
+<p>Algorithm 1展示了完整的训练优化过程，损失经过简化变成一个简单的均方损失函数。Algorithm 2中第4行公式$\epsilon$代表预测噪声，反向过程（马尔科夫过程）需要逐步去噪，$\alpha_t$是时间步调度器（与时间步设置有关），其次是一个$\sigma_tz$，是因为DDPM中每次在去噪后的图像上会再加入一点噪声来增加生成的多样性。</p>
+<figure>
+    <img src="DDPM3.png" srcset="/blog/img/loading.gif" lazyload alt="DDPM" style="width:70%;">
+    <figcaption>图4: 时间步长调度器超参变化曲线</figcaption>
+</figure>
+
+
+<p>简单实现扩散模型的训练过程。</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">from</span> diffusers <span class="hljs-keyword">import</span> UNet2DModel
+<span class="hljs-keyword">from</span> diffusers <span class="hljs-keyword">import</span> DDPMScheduler
+<span class="hljs-keyword">import</span> torch
+
+<span class="hljs-comment"># create model</span>
+model = UNet2DModel(
+    sample_size=image_size,
+    in_channels=<span class="hljs-number">3</span>,
+    out_channels=<span class="hljs-number">3</span>,
+    layers_per_block=<span class="hljs-number">2</span>,
+    block_out_channels=(<span class="hljs-number">64</span>, <span class="hljs-number">128</span>, <span class="hljs-number">128</span>, <span class="hljs-number">256</span>),
+    down_block_types=(
+        <span class="hljs-string">&quot;DownBlock2D&quot;</span>,
+        <span class="hljs-string">&quot;DownBlock2D&quot;</span>,
+        <span class="hljs-string">&quot;AttnDownBlock2D&quot;</span>,
+        <span class="hljs-string">&quot;AttnDownBlock2D&quot;</span>,
+    ),
+    up_block_types=(
+        <span class="hljs-string">&quot;AttnUpBlock2D&quot;</span>,
+        <span class="hljs-string">&quot;AttnUpBlock2D&quot;</span>,
+        <span class="hljs-string">&quot;UpBlock2D&quot;</span>,
+        <span class="hljs-string">&quot;UpBlock2D&quot;</span>,
+    ),
+)
+model.to(device)
+
+<span class="hljs-comment"># 设定噪声调度器</span>
+noise_scheduler = DDPMScheduler(
+    num_train_timesteps=<span class="hljs-number">1000</span>,
+    beta_schedule=<span class="hljs-string">&quot;squaredcos_cap_v2&quot;</span>,
+)
+
+<span class="hljs-comment"># 训练循环</span>
+optimizer = torch.optim.AdamW(model.parameters(), lr=<span class="hljs-number">4e-4</span>)
+
+losses = []
+
+<span class="hljs-keyword">for</span> epoch <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">30</span>):
+    <span class="hljs-keyword">for</span> step, batch <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(train_dataloader):
+        clean_images = batch[<span class="hljs-string">&quot;images&quot;</span>].to(device)
+        <span class="hljs-comment"># add noisy for image</span>
+        noise = torch.randn(clean_images.shape).to(clean_images.device)
+        bs = clean_images.shape[<span class="hljs-number">0</span>]
+
+        <span class="hljs-comment"># select a random timestep for every image</span>
+        timesteps = torch.randint(
+            <span class="hljs-number">0</span>, noise_scheduler.num_train_timesteps, (bs,),
+            device=clean_images.device
+        ).long()
+
+        <span class="hljs-comment"># Add noise to a clear image based on the noise amplitude at each timestep</span>
+        noisy_images = noise_scheduler.add_noise(
+            clean_images,
+            noise,
+            timesteps
+        )
+
+        <span class="hljs-comment"># obtain results</span>
+        noise_pred = model(noisy_images, timesteps, return_dict=<span class="hljs-literal">False</span>)[<span class="hljs-number">0</span>]
+
+        <span class="hljs-comment"># compute loss</span>
+        loss = F.mse_loss(noise_pred, noise)
+        <span class="hljs-comment"># backward</span>
+        loss.backward(loss)</code></pre></div>
+
+<p>实验部分在CIFAR-10和CELEBA-HQ数据集上测试图像的生成能力，评估指标选用了FID与IS，更详细内容可以参考原<a target="_blank" rel="noopener" href="https://proceedings.neurips.cc/paper_files/paper/2020/file/4c5bcfec8584af0d967f1ab10179ca4b-Paper.pdf">论文</a>。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BB/" class="category-chain-item">论文解读</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/blog/tags/DeepLearning/" class="print-no-link">#DeepLearning</a>
+      
+        <a href="/blog/tags/Diffusion-Model/" class="print-no-link">#Diffusion Model</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>论文解读——Denoising Diffusion Probability Model原理与代码分析</div>
+      <div>https://jiawei804.github.io/blog/2023/12/21/2023/12/21/DDPM/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Zhang Jiawei</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年12月21日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2023/12/23/2023/12/23/cfg/" title="无分类器指导|classifier-free guidance scale">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">无分类器指导|classifier-free guidance scale</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2023/12/19/2023/12/19/transformer/" title="论文解读——Attention is all you need（理解transformer原理及实现）">
+                        <span class="hidden-mobile">论文解读——Attention is all you need（理解transformer原理及实现）</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/blog/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/blog/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

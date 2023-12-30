@@ -1,0 +1,1005 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/images/fluid.png">
+  <link rel="icon" href="/blog/images/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#93b5cf">
+  <meta name="author" content="Zhang Jiawei">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="论文解读——Attention is all you need（理解transformer原理及实现）neurips2017 论文地址 基于tensorflow2.x的实现  摘要：本篇论文是由goole Brain在2017年发表的一篇论文，提出了一个广泛应用于自然语言处理任务的新模型，即Transformer。主要贡献 ： 1.Transformer是开创性的工作，引领了后来深度学习的发展，截">
+<meta property="og:type" content="article">
+<meta property="og:title" content="论文解读——Attention is all you need（理解transformer原理及实现）">
+<meta property="og:url" content="https://jiawei804.github.io/blog/2023/12/19/2023/12/19/transformer/index.html">
+<meta property="og:site_name" content="Jiawei&#39;s Blog">
+<meta property="og:description" content="论文解读——Attention is all you need（理解transformer原理及实现）neurips2017 论文地址 基于tensorflow2.x的实现  摘要：本篇论文是由goole Brain在2017年发表的一篇论文，提出了一个广泛应用于自然语言处理任务的新模型，即Transformer。主要贡献 ： 1.Transformer是开创性的工作，引领了后来深度学习的发展，截">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://jiawei804.github.io/blog/images/2023/12-19.jpg">
+<meta property="article:published_time" content="2023-12-18T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-27T01:26:07.567Z">
+<meta property="article:author" content="Zhang Jiawei">
+<meta property="article:tag" content="DeepLearning">
+<meta property="article:tag" content="Transformer">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://jiawei804.github.io/blog/images/2023/12-19.jpg">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>论文解读——Attention is all you need（理解transformer原理及实现） - Jiawei&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/blog/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/blog/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/blog/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"jiawei804.github.io","root":"/blog/","version":"1.9.6","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":"4016bcd321494fdaa4814573925fc604","google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/blog/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+  
+
+  
+    <!-- Baidu Analytics -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?4016bcd321494fdaa4814573925fc604";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+      }
+    </script>
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/blog/">
+      <strong>jiaweijson</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="iconfont icon-link-fill"></i>
+                <span>链接</span>
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="https://jiawei804.github.io/homepage/" target="_self">
+                    
+                    <span>学术主页</span>
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="https://500px.com.cn/JiaweiZhang/" target="_self">
+                    
+                    <span>摄影</span>
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/blog/images/2023/12-19-cover.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="论文解读——Attention is all you need（理解transformer原理及实现）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-12-19 00:00" pubdate>
+          2023年12月19日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          19 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">论文解读——Attention is all you need（理解transformer原理及实现）</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="论文解读——Attention-is-all-you-need（理解transformer原理及实现）"><a href="#论文解读——Attention-is-all-you-need（理解transformer原理及实现）" class="headerlink" title="论文解读——Attention is all you need（理解transformer原理及实现）"></a>论文解读——Attention is all you need（理解transformer原理及实现）</h1><p><code>neurips2017</code></p>
+<p><a target="_blank" rel="noopener" href="https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf">论文地址</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/Jiawei804/transformer">基于tensorflow2.x的实现</a></p>
+<blockquote>
+<p>摘要：本篇论文是由goole Brain在2017年发表的一篇论文，提出了一个广泛应用于自然语言处理任务的新模型，即Transformer。主要贡献 ：</p>
+<p>1.Transformer是开创性的工作，引领了后来深度学习的发展，截止到2023年，除了在NLP领域，在其他模态下引用Transformer的思想和架构成为主流。</p>
+<p>2.在NLP领域主导的架构是循环神经网络（RNN），Transformer摒弃了RNN的架构，实现了训练并行，提高了训练效率。</p>
+<p>3.提出的自注意力机制（self-Attention）被广泛应用于其他网络，推动了深度学习的发展，是后来BERT、GPT等模型的基础。</p>
+</blockquote>
+<h2 id="Transformer究竟长什么样子？"><a href="#Transformer究竟长什么样子？" class="headerlink" title="Transformer究竟长什么样子？"></a>Transformer究竟长什么样子？</h2><p>话不多说，先上图。</p>
+<figure>
+    <img src="1.jpg" srcset="/blog/img/loading.gif" lazyload alt="Transformer" style="width:100%;">
+    <figcaption style="font-size: 14px;">图1: Transofrmer结构</figcaption>
+</figure>
+
+
+<p>先从宏观上介绍，Transformer一共有两部分组成，第一部分是编码器Encoder（左），第二部分是解码器Decoder（右）。位置编码（Positional Encoding）来记录位置信息，Input Embedding、Output Embedding将输入向量转化为Embedding嵌入，然后将二者加起来喂入模型，Decoder最终的输出会通过全连接层和SoftMax得到词表的概率分布，最简单的方式是选出概率最高的词作为候选词。接下来来详细聊一聊内部的设计。</p>
+<h2 id="编码器Encoder"><a href="#编码器Encoder" class="headerlink" title="编码器Encoder"></a>编码器Encoder</h2><p>我们从Inputs一步一步梳理。</p>
+<p>假设我们的训练集只有一句文本，首先要通过分词器tokenizer转变成词id，tokenizer有三种划分方式：分别是char-level、word-level、sub-level。目前更流行的是词根分词（sub-level）。我们假设文本通过tokenizer得到一个$(1,40)$的一个向量，这个就是准备好的Inputs。</p>
+<p>之后，我们将Inputs输入到Embedding层（假设Embedding维度为512），得到一个$(1,50,512)$的词嵌入向量（Embedding中会将Inputs变为one-hot编码之后做矩阵运算（1，50，vocab_size）@（vocab_size，512））。</p>
+<figure>
+    <img src="2.jpg" srcset="/blog/img/loading.gif" lazyload alt="Transformer" style="width:100%;">
+    <figcaption style="font-size: 14px;">图2: Position Embedding</figcaption>
+</figure>
+
+<p>此论文中的提出的位置编码是确定的值，只与位置有关无需训练得到，pos就是词的位置（这里的词不是word而是sub），$d_{model}$是超参数，这里举例512，维度是$(50,512)$。之后我们将Position Embedding扩展一个维度与Embedding嵌入逐元素相加之后输入到Encoder。</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># PE(pos, 2i)   = sin(pos / 10000^(2i/d_model))</span>
+<span class="hljs-comment"># PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))</span>
+
+<span class="hljs-comment"># pos 和 i</span>
+<span class="hljs-comment"># pos.shape: (seq_len, 1)</span>
+<span class="hljs-comment"># i.shape: (1, d_model)</span>
+<span class="hljs-comment"># PE(pos, i).shape: (seq_len, d_model)</span>
+
+<span class="hljs-comment"># 计算 pos / 10000^(2i/d_model)</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">get_angles</span>(<span class="hljs-params">pos, i, d_model</span>):
+    angles = <span class="hljs-number">1</span> / np.power(<span class="hljs-number">10000</span>, (<span class="hljs-number">2</span> * (i // <span class="hljs-number">2</span>)) / np.float32(d_model))
+    <span class="hljs-keyword">return</span> pos * angles
+<span class="hljs-comment"># 计算位置信息,sentence_length长度是多少，就有多少个位置要变为位置编码</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">get_position_embedding</span>(<span class="hljs-params">sentence_length, d_model</span>):
+    
+    
+    angle_rads = get_angles(np.arange(sentence_length)[:, np.newaxis],
+                            np.arange(d_model)[np.newaxis, :],
+                            d_model)
+    <span class="hljs-comment"># sines.shape: [seq_len, d_model / 2]</span>
+    <span class="hljs-comment"># cosines.shape: [seq_len, d_model / 2]</span>
+    sines = np.sin(angle_rads[:, <span class="hljs-number">0</span>::<span class="hljs-number">2</span>])
+    cosines = np.cos(angle_rads[:, <span class="hljs-number">1</span>::<span class="hljs-number">2</span>])
+    <span class="hljs-comment"># position_embedding.shape: [seq_len, d_model]</span>
+    position_embedding = np.concatenate([sines, cosines], axis=-<span class="hljs-number">1</span>)
+    <span class="hljs-comment"># 进行维度扩展，把[seq_len, d_model]，变为[1, seq_len, d_model]</span>
+    position_embedding = position_embedding[np.newaxis, ...]
+    <span class="hljs-comment"># 变为float32类型 </span>
+    <span class="hljs-keyword">return</span> tf.cast(position_embedding, dtype=tf.float32)</code></pre></div>
+
+
+<figure>
+    <img src="3.jpg" srcset="/blog/img/loading.gif" lazyload alt="Transformer" style="width:80%;">
+    <figcaption style="font-size: 14px;">图3: Position Embedding热力图</figcaption>
+</figure>
+
+
+<p>接下来，我们拿一个Encoder举例，N×代表多个Encoder叠加。Encoder的第一个模块是多头注意力（Multi-Head Attention），也是Transformer的核心。</p>
+<h3 id="多头注意力"><a href="#多头注意力" class="headerlink" title="多头注意力"></a>多头注意力</h3><p>多头注意力是由多个缩放点积注意力（自注意力Self-Attention）组成的。</p>
+<figure>
+    <img src="4.jpg" srcset="/blog/img/loading.gif" lazyload alt="Transformer" style="width:80%;">
+    <figcaption style="font-size: 14px;">图4: 缩放点积注意力与注意力计算公式</figcaption>
+</figure>
+
+
+<p>多头注意力首先有三个全连接层$W_{Q}$，$W_{K}$，$W_{V}$，Encoder的输入经过这三个全连接层得到$Q、K、V$三个向量，维度都是$(1,50,512)$，之后拆分成8个缩放点积注意力，$q、k、v$维度变为$(1,8,50,64)$。然后计算Attention（公式如上$d_{k}$是$k$的最后一个维度，因为前面的层用的是$d_{model}$所以仍然是512）。每一个 Attention的维度$(1,1,50,64)$，之后再拼接起来就是$(1,8,50,64)$，之后再做维度变换变成$(1,50,512)$。之后做残差连接，然后层归一化（Add &amp; Norm）。</p>
+<p>之后就就进入到一个前馈网络，前馈网络由两个全连接层组成，主要用来做放缩，之后同样做残差连接，然后层归一化（Add &amp; Norm）。最后得到Encoder的输出，也被称为Encoder Hidden State。</p>
+<figure>
+    <img src="5.jpg" srcset="/blog/img/loading.gif" lazyload alt="Transformer" style="width:80%;">
+    <figcaption style="font-size: 14px;">图5: 缩放点积注意力与多头注意力</figcaption>
+</figure>
+
+
+<h2 id="解码器Decoder"><a href="#解码器Decoder" class="headerlink" title="解码器Decoder"></a>解码器Decoder</h2><p>解码器与编码器的层结构完全一样，只不过一个解码器有两个注意力层和一个前馈网络层。</p>
+<p>第一个注意力是自己的注意力，第二个注意力是结合了Encoder Hidden State，即Encoder的输出作为</p>
+<p>$K、V$，Decoder的第一个注意力层的输出作为$Q$，然后计算Attention分数。</p>
+<p>最终Decoder模块的输出会经过全连接层和SoftMax来得到词表中每个词的概率值 ，选出概率最高的作为候选值。</p>
+<h2 id="为什么可以实现并行训练？"><a href="#为什么可以实现并行训练？" class="headerlink" title="为什么可以实现并行训练？"></a>为什么可以实现并行训练？</h2><p>在实现细节里，还有很重要的一个部分就是掩码mask，Transformer通过掩码矩阵，使得模型在单步训练中只可以看到它应该看到的信息。在 mask 里，应该被忽略的我们会设成 1，应该被保留的会设成 0。如果 mask 相应位置上为 1，那么我们就给对应的 logits 加上一个超级小的负数， -1e-12， 这样，对应的 logits 也就变成了一个超级小的数。然后在计算 softmax 的时候，一个超级小的数的指数会无限接近与 0。也就是它对应的 attention 的权重就是 0 了。</p>
+<figure>
+    <img src="6.jpg" srcset="/blog/img/loading.gif" lazyload alt="Transformer" style="width:80%;">
+    <figcaption style="font-size: 14px;">图5: mask掩码</figcaption>
+</figure>
+
+
+<p>对于Encoder，有两个mask，第一个mask是为了屏蔽掉padding部分，在最开始做数据处理时，需要对文本对齐，比如我们规定文本tokenizer之后的id长度最大为50。另外一个是类似的上三角矩阵。第一个词只能注意到自己，第二个词可以注意到第一个词。第三个词可以注意到前两个词，依次类推。。。</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># 1. padding_mask</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">create_padding_mask</span>(<span class="hljs-params">batch_data</span>):
+    <span class="hljs-string">&quot;&quot;&quot;</span>
+<span class="hljs-string">    :param batch_data: [batch_size, seq_len]</span>
+<span class="hljs-string">    :return: [batch_size, 1, 1, seq_len]</span>
+<span class="hljs-string">    &quot;&quot;&quot;</span>
+    padding_mask = tf.cast(tf.math.equal(batch_data, <span class="hljs-number">0</span>), dtype=tf.float32)
+    <span class="hljs-keyword">return</span> padding_mask[:, tf.newaxis, tf.newaxis, :]
+
+
+
+<span class="hljs-comment"># 2. look_ahead_mask(上三角矩阵，每个词只能注意到前面的没有预知未来的能力)</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">create_look_ahead_mask</span>(<span class="hljs-params">size</span>):
+    mask = <span class="hljs-number">1</span> - tf.linalg.band_part(tf.ones((size, size)), -<span class="hljs-number">1</span>, <span class="hljs-number">0</span>)
+    <span class="hljs-keyword">return</span> mask <span class="hljs-comment"># (seq_len, seq_len)</span>
+
+</code></pre></div>
+
+<p>对于Decoder，先来说第二个注意力，在$Q*K^T$的运算后得logits，维度是$(…, seq_len_q, seq_len_k)$，logits需要加上Encoder的padding_mask，因为Decoder不需要花费精力去注意Encoder的padding部分。其次来看第一个注意力，第一个注意力与Encoder一样，训练过程中，每一个位置的词不应该看到后面位置的词，以及不应该花时间去注意padding的部分（对于训练而言）。</p>
+<p>个人理解所谓的并行训练就是不需要等待输出结果，每一次Decoder的输入都会使用每个位置正确的词。在推理（预测）中，是不可以并行的，依然需要串行生成。</p>
+<h2 id="学习率warm-up"><a href="#学习率warm-up" class="headerlink" title="学习率warm-up"></a>学习率warm-up</h2><p>这并不是开创性工作，但是这篇论文里用到了这个技术，那就来简单说一说，学习率预热是指在训练的初始阶段，学习率会从一个很小的值逐渐增加，根据设定的超参数决定在哪一步达到设置的值，之后保持不变，这种称之为warm-up_constant，还有很多变种其中包括先上升后下降。</p>
+<figure>
+    <img src="7.jpg" srcset="/blog/img/loading.gif" lazyload alt="Transformer" style="width:60%;">
+    <figcaption style="font-size: 14px;">图5: warm-up学习率预热曲线</figcaption>
+</figure>
+
+
+<h2 id="机器翻译的评价指标——bleu"><a href="#机器翻译的评价指标——bleu" class="headerlink" title="机器翻译的评价指标——bleu"></a>机器翻译的评价指标——bleu</h2><p>论文里作者着眼NLP领域的机器翻译任务，采用bleu评价指标，在这里做一个介绍。</p>
+<h3 id="什么是bleu？"><a href="#什么是bleu？" class="headerlink" title="什么是bleu？"></a>什么是bleu？</h3><p>BLEU（Bilingual Evaluation Understudy）是一种用于自动评估机器翻译质量的指标。它最初由Kishore Papineni等人在2002年提出，旨在解决人工评估翻译质量的主观性和费时性问题。BLEU的工作原理是将机器生成的翻译与人工参考翻译进行比较，并根据它们之间的相似性分配一个分数。我们可以通过微软的nltk框架来使用bleu指标。</p>
+<p>BLEU的计算方式如下：</p>
+<ol>
+<li><p>对于翻译结果（机器生成的翻译），它会计算参考翻译（目标值）之间的 n-gram（连续的 n 个词或字符序列）匹配度。</p>
+</li>
+<li><p>对每个 n-gram 匹配，BLEU将其与候选翻译中的 n-gram 数量相比较，并采用一种修正的精确匹配度度量来计算得分。</p>
+</li>
+<li><p>然后，BLEU将各个 n-gram 匹配的得分合并，通过计算几何平均值来得出最终的 BLEU 分数。通常，BLEU 的分数在0到1之间，表示翻译的质量，越接近1表示越好。</p>
+</li>
+</ol>
+<p><strong>公式如下：</strong><br>$$<br>bleu &#x3D; exp^{\sum weight*logP}*惩罚系数<br>$$</p>
+<h3 id="什么是n-gram？"><a href="#什么是n-gram？" class="headerlink" title="什么是n-gram？"></a>什么是n-gram？</h3><div class="code-wrapper"><pre><code class="hljs">与其解释抽象的公式，不如来一段代码实战理解，请看下面这段代码。
+</code></pre></div>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">from</span> nltk.translate.bleu.score <span class="hljs-keyword">import</span> sentence_bleu
+reference = [[<span class="hljs-string">&#x27;the&#x27;</span>,<span class="hljs-string">&#x27;quick&#x27;</span>,<span class="hljs-string">&#x27;brown&#x27;</span>,<span class="hljs-string">&#x27;fox&#x27;</span>,<span class="hljs-string">&#x27;jumped&#x27;</span>,<span class="hljs-string">&#x27;over&#x27;</span>,<span class="hljs-string">&#x27;the&#x27;</span>,<span class="hljs-string">&#x27;lazy&#x27;</span>,<span class="hljs-string">&#x27;dog&#x27;</span>]]
+candidate = [<span class="hljs-string">&#x27;the&#x27;</span>,<span class="hljs-string">&#x27;quick&#x27;</span>,<span class="hljs-string">&#x27;brown&#x27;</span>,<span class="hljs-string">&#x27;fox&#x27;</span>,<span class="hljs-string">&#x27;jumped&#x27;</span>,<span class="hljs-string">&#x27;over&#x27;</span>,<span class="hljs-string">&#x27;the&#x27;</span>,<span class="hljs-string">&#x27;lazy&#x27;</span>,<span class="hljs-string">&#x27;dog&#x27;</span>]
+score = sentence.bleu(reference, candidate)
+<span class="hljs-built_in">print</span>(score)
+<span class="hljs-comment"># out: 1.0</span>
+
+<span class="hljs-comment"># 4-gram cumulative BLEU</span>
+candidate = [<span class="hljs-string">&#x27;the&#x27;</span>,<span class="hljs-string">&#x27;fast&#x27;</span>,<span class="hljs-string">&#x27;brown&#x27;</span>,<span class="hljs-string">&#x27;fox&#x27;</span>,<span class="hljs-string">&#x27;jumped&#x27;</span>,<span class="hljs-string">&#x27;over&#x27;</span>,<span class="hljs-string">&#x27;the&#x27;</span>,<span class="hljs-string">&#x27;lazy&#x27;</span>,<span class="hljs-string">&#x27;dog&#x27;</span>]
+score = sentence_bleu(reference, candidate, weights=(<span class="hljs-number">0.25</span>, <span class="hljs-number">0.25</span>, <span class="hljs-number">0.25</span>, <span class="hljs-number">0.25</span>))
+<span class="hljs-built_in">print</span>(score)
+<span class="hljs-comment"># out:0.75</span>
+
+<span class="hljs-comment"># 手动计算</span>
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+score = np.exp(<span class="hljs-number">0.25</span> * (np.log(<span class="hljs-number">8</span>/<span class="hljs-number">9</span>) + np.log(<span class="hljs-number">6</span>/<span class="hljs-number">8</span>) + np.log(<span class="hljs-number">5</span>/<span class="hljs-number">7</span>) + np.log(<span class="hljs-number">4</span>/<span class="hljs-number">6</span>)))
+<span class="hljs-built_in">print</span>(score)
+<span class="hljs-comment"># out:0.75</span></code></pre></div>
+
+<ul>
+<li><p>过短惩罚系数，上例预测结果与目标结果长度一致，故为1。</p>
+<ul>
+<li>当预测结果比目标结果短时，过短惩罚系数就不为1了。</li>
+</ul>
+</li>
+<li><p>在实际中，参考句可能不止一句，所以reference是二维。</p>
+<ul>
+<li>实际上，只要reference比candidate多一个维度就可以，candidate未必是一维的。</li>
+</ul>
+</li>
+<li><p>n-gram实际上就是连续n个词一样。</p>
+</li>
+<li><p>weights是对每个gram赋予一个权重。</p>
+</li>
+<li><p>4-gram考查了1个，2个，3个，4个连续的词相同的情况。</p>
+</li>
+<li><p>P是连续n个词相同的概率。</p>
+</li>
+<li><p>bleu一定是一个0-1之间的值。</p>
+<ul>
+<li>P是0-1之间，logP是负数，乘以weights仍然是负数。</li>
+<li>e的负数次幂在0-1之间。</li>
+<li>过短惩罚系数是一个0-1之间的值。</li>
+</ul>
+</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>以上是论文的主要贡献，开创性的Transformer架构成为了深度学习划时代的标志，像此后的GPT模型就是采用Decoder模块堆叠，他们的底层原理都来自于这一工作。谈到GPT3.5的成功，其实并不是谁都可以做的这么好，这是OpenAI在算法，工程和系统问题上的集大成之作。</p>
+<p>在知乎等各种平台上，我们可以看到很多解读这篇论文的工作，作为一名在深度学习领域学习探索的学生，都应该认真学习这篇跨时代意义的论文。</p>
+<p>“Don’t dwell on the past, the moments take  our breath away will actually measure the life.”</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BB/" class="category-chain-item">论文解读</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/blog/tags/DeepLearning/" class="print-no-link">#DeepLearning</a>
+      
+        <a href="/blog/tags/Transformer/" class="print-no-link">#Transformer</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>论文解读——Attention is all you need（理解transformer原理及实现）</div>
+      <div>https://jiawei804.github.io/blog/2023/12/19/2023/12/19/transformer/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Zhang Jiawei</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年12月19日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2023/12/21/2023/12/21/DDPM/" title="论文解读——Denoising Diffusion Probability Model原理与代码分析">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">论文解读——Denoising Diffusion Probability Model原理与代码分析</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2023/12/18/2023/12/18/high_school/" title="高中|17级18班">
+                        <span class="hidden-mobile">高中|17级18班</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/blog/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/blog/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
