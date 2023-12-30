@@ -16,27 +16,26 @@
   <meta name="author" content="Zhang Jiawei">
   <meta name="keywords" content="">
   
-    <meta name="description" content="论文解读——DiT|Scalable Diffusion Models with TransformersICCV2023  摘要：本文是由meta研究人员提出的基于transformer架构的扩散模型，将主干网络（backbone）UNet替换为应用潜空间patches的transformer结构（参考了ViTs网络结构）。主要贡献如下： 1.全新的扩散模型结构，主干网络替换为transform">
+    <meta name="description" content="年度AI事件毫无疑问，2022年11月30日ChatGPT的发布，代表着人工智能新一轮的热潮，而2023年的这些故事将会塑造一个全新的未来： 人工智能的进展在今年的人工智能领域，可谓是神仙打架，国外的微软、谷歌、Meta等互相比拼，国内也爆发白模大战。这一年中，文生图以及文生视频等赛道都孵化出了令人惊艳的产品。 图像生成 Midjourney： Midjourney 的 V.5 模型标志着图像生成">
 <meta property="og:type" content="article">
-<meta property="og:title" content="论文解读——DiT|Scalable Diffusion Models with Transformers">
-<meta property="og:url" content="https://jiawei804.github.io/blog/2023/12/27/2023/12/27/DiT/index.html">
+<meta property="og:title" content="2023年度AI事件">
+<meta property="og:url" content="https://jiawei804.github.io/blog/2023/12/30/2023/12/30/AI%E5%A4%A7%E4%BA%8B%E4%BB%B6/index.html">
 <meta property="og:site_name" content="Jiawei&#39;s Blog">
-<meta property="og:description" content="论文解读——DiT|Scalable Diffusion Models with TransformersICCV2023  摘要：本文是由meta研究人员提出的基于transformer架构的扩散模型，将主干网络（backbone）UNet替换为应用潜空间patches的transformer结构（参考了ViTs网络结构）。主要贡献如下： 1.全新的扩散模型结构，主干网络替换为transform">
+<meta property="og:description" content="年度AI事件毫无疑问，2022年11月30日ChatGPT的发布，代表着人工智能新一轮的热潮，而2023年的这些故事将会塑造一个全新的未来： 人工智能的进展在今年的人工智能领域，可谓是神仙打架，国外的微软、谷歌、Meta等互相比拼，国内也爆发白模大战。这一年中，文生图以及文生视频等赛道都孵化出了令人惊艳的产品。 图像生成 Midjourney： Midjourney 的 V.5 模型标志着图像生成">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://jiawei804.github.io/blog/images/2023/12-27.jpg">
-<meta property="article:published_time" content="2023-12-26T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-12-30T02:57:26.576Z">
+<meta property="og:image" content="https://jiawei804.github.io/blog/images/2023/12-30.jpg">
+<meta property="article:published_time" content="2023-12-29T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-30T14:38:45.498Z">
 <meta property="article:author" content="Zhang Jiawei">
-<meta property="article:tag" content="Diffusion Model">
-<meta property="article:tag" content="Transformer">
+<meta property="article:tag" content="AI">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://jiawei804.github.io/blog/images/2023/12-27.jpg">
+<meta name="twitter:image" content="https://jiawei804.github.io/blog/images/2023/12-30.jpg">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
   
   
-  <title>论文解读——DiT|Scalable Diffusion Models with Transformers - Jiawei&#39;s Blog</title>
+  <title>2023年度AI事件 - Jiawei&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -280,13 +279,13 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('/blog/images/2023/12-27-cover.jpg') no-repeat center center; background-size: cover;">
+     style="background: url('/blog/images/2023/12-30-cover.jpg') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="论文解读——DiT|Scalable Diffusion Models with Transformers"></span>
+            <span id="subtitle" data-typed-text="2023年度AI事件"></span>
           
         </div>
 
@@ -297,8 +296,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-12-27 00:00" pubdate>
-          2023年12月27日 凌晨
+        <time datetime="2023-12-30 00:00" pubdate>
+          2023年12月30日 凌晨
         </time>
       </span>
     
@@ -309,7 +308,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.2k 字
+          1.5k 字
         
       </span>
     
@@ -320,7 +319,7 @@
         
         
         
-          11 分钟
+          13 分钟
         
       </span>
     
@@ -357,94 +356,117 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">论文解读——DiT|Scalable Diffusion Models with Transformers</h1>
+            <h1 id="seo-header">2023年度AI事件</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="论文解读——DiT-Scalable-Diffusion-Models-with-Transformers"><a href="#论文解读——DiT-Scalable-Diffusion-Models-with-Transformers" class="headerlink" title="论文解读——DiT|Scalable Diffusion Models with Transformers"></a>论文解读——DiT|Scalable Diffusion Models with Transformers</h1><p><code>ICCV2023</code></p>
-<blockquote>
-<p>摘要：本文是由meta研究人员提出的基于transformer架构的扩散模型，将主干网络（backbone）UNet替换为应用潜空间patches的transformer结构（参考了ViTs网络结构）。主要贡献如下：</p>
-<p>1.全新的扩散模型结构，主干网络替换为transformer结构，并将新的扩散模型称之为DiT。</p>
-<p>2.主要探索：条件模块设计中设计了四种变体、patch size、transformer block architecture、model size。</p>
-</blockquote>
-<h2 id="Diffusion-Transformers"><a href="#Diffusion-Transformers" class="headerlink" title="Diffusion Transformers"></a>Diffusion Transformers</h2><p>DiT的整体结构沿用了潜在扩散模型（LDM），其中VAE、Scheduler等结构并未发生改变，且在训练DiT中加载预训练的模型，在反向去噪过程中，所使用的主干网络UNet被替换为Transformer结构，关于Transformer应用于图像处理请参考ViT模型，DiT主干网络参考了很多ViT的最佳实践。</p>
-<h2 id="四种变体（four-variants-of-transformer-blocks-that-process-conditional-inputs-differently）"><a href="#四种变体（four-variants-of-transformer-blocks-that-process-conditional-inputs-differently）" class="headerlink" title="四种变体（four variants of transformer blocks that process conditional inputs differently）"></a>四种变体（four variants of transformer blocks that process conditional inputs differently）</h2><h3 id="In-context-conditioning"><a href="#In-context-conditioning" class="headerlink" title="In-context conditioning"></a>In-context conditioning</h3><p>这种方式是指将条件信息转化为token直接与输入序列拼接，然后在送入模型训练，这种方式无需修改ViT的结构，使用标准ViT块就可以实现，在最后一个Transformer块之后删除条件信息。</p>
+                <h1 id="年度AI事件"><a href="#年度AI事件" class="headerlink" title="年度AI事件"></a>年度AI事件</h1><p>毫无疑问，2022年11月30日ChatGPT的发布，代表着人工智能新一轮的热潮，而2023年的这些故事将会塑造一个全新的未来：</p>
+<h2 id="人工智能的进展"><a href="#人工智能的进展" class="headerlink" title="人工智能的进展"></a>人工智能的进展</h2><p>在今年的人工智能领域，可谓是神仙打架，国外的微软、谷歌、Meta等互相比拼，国内也爆发白模大战。这一年中，文生图以及文生视频等赛道都孵化出了令人惊艳的产品。</p>
+<h3 id="图像生成"><a href="#图像生成" class="headerlink" title="图像生成"></a><strong>图像生成</strong></h3><ul>
+<li><strong>Midjourney：</strong> <a target="_blank" rel="noopener" href="https://journal.everypixel.com/top-ai-news-march-2023">Midjourney 的 V.5 模型</a>标志着图像生成领域的一个里程碑，展示了更高的效率、一致性和更高的分辨率。而最近最新的<a target="_blank" rel="noopener" href="https://mid-journey.ai/midjourney-v6-release/">Midjourney V.6</a>带来了额外的增强功能，例如更准确的提示跟随、增加的模型知识和较小的文本绘制能力。</li>
+</ul>
 <figure>
-    <img src="DiT.jpg" srcset="/blog/img/loading.gif" lazyload alt="DiT" style="width:80%;">
-    <figcaption>图1: ViT图像输入</figcaption>
+    <img src="1.jpg" srcset="/blog/img/loading.gif" lazyload alt="CLIP" style="width:80%;">
+    <figcaption>(上v6，下v5）</figcaption>
 </figure>
 
-<p>类似于上图，演示了将图片变成序列并嵌入类别标记。</p>
-<h3 id="Cross-attention-block"><a href="#Cross-attention-block" class="headerlink" title="Cross-attention block"></a>Cross-attention block</h3><p>使用交叉注意力，当使用交叉注意力时，模型不需要将类别标记与时间标记等条件信息嵌入序列，而是把它们作为单独的序列，通过交叉注意力将二者合并。这样的方式条件信息的种类可以更丰富，但是同时也会为模型增加最大的计算量。</p>
-<h3 id="Adaptive-layer-norm-adaLN-block"><a href="#Adaptive-layer-norm-adaLN-block" class="headerlink" title="Adaptive layer norm (adaLN) block."></a>Adaptive layer norm (adaLN) block.</h3><p>主要是说标准层归一化被adaLN取代，通过时间 $t$ 与类别标记 $c$ 的嵌入向量回归得到缩放因子与偏移因子。</p>
-<h3 id="adaLN-Zero-block"><a href="#adaLN-Zero-block" class="headerlink" title="adaLN-Zero block"></a>adaLN-Zero block</h3><p>在UNet中，每个块的最后一个卷积层都会进行0初始化，在实践中发现这样的初始化有利于加速模型收敛，所以在DiT的结构中，作者也对adaLN的参相关参数（缩放因子与偏移因子）进行了0初始化。</p>
-<p>模型的详细配置参考下图，划分出四种不同的模型大小。</p>
+  
+
+<ul>
+<li><strong>DALL·E 3：</strong><a target="_blank" rel="noopener" href="https://journal.everypixel.com/top-ai-news-september-2023">DALL·E 3</a> 基于 ChatGPT 构建， 简化了图像生成，无需复杂的提示工程。此外，ChatGPT还引入了一项功能，可以帮助用户完善提示并根据反馈进行图像调整。</li>
+</ul>
 <figure>
-    <img src="DiT1.jpg" srcset="/blog/img/loading.gif" lazyload alt="DiT" style="width:80%;">
-    <figcaption>图2: DiT不同模型尺寸</figcaption>
+    <img src="2.jpg" srcset="/blog/img/loading.gif" lazyload alt="CLIP" style="width:80%;">
+    <figcaption>(左DELL·2，右DELL·3）</figcaption>
 </figure>
 
-
-
-<h2 id="实验设置"><a href="#实验设置" class="headerlink" title="实验设置"></a>实验设置</h2><p>patches是指将图像按像素级分割，比如p&#x3D;2，图像尺寸为256×256，那么分割后的patches数量为(256&#x2F;&#x2F;2)×(256&#x2F;2)，DiT-XL&#x2F;2表示XLarge型号的模型，patch size是2×2。</p>
-<figure>
-    <img src="DiT2.jpg" srcset="/blog/img/loading.gif" lazyload alt="DiT" style="width:50%;">
-    <figcaption>图3: DiT结构设计</figcaption>
-</figure>
-
-<p>在ImageNet 数据集 上以 256 × 256 和 512 × 512 图像分辨率上训练类条件潜在 DiT 模型，应用输出线性层0初始化，优化器使用adamW。学习率恒定，设置为1e-4，批量大小为256，唯一使用的数据增强是水平翻转。使用指数滑动平均（EMA）来处理模型权重，在评估阶段，全部使用EMA模型。此外，无其他系数的衰减。依然使用VAE将图像映射到隐空间，VAE加载现成的模型预训练参数，并在训练中保持不变。</p>
-<h3 id="评估指标"><a href="#评估指标" class="headerlink" title="评估指标"></a>评估指标</h3><p>在评估时使用250个DDPM采样步骤报告FID-50K。</p>
-<p>使用的是ADM的<a target="_blank" rel="noopener" href="https://github.com/openai/guided-diffusion">tensorflow评估套件</a>。</p>
-<h2 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h2><figure>
-    <img src="DiT3.jpg" srcset="/blog/img/loading.gif" lazyload alt="DiT" style="width:60%;">
-    <figcaption>图4: 4种条件策略对比</figcaption>
-</figure>
-
-
-
-
-
-<p>训练了四个最高Gflops的DiT-XL&#x2F;2 模型，每个模型都使用不同的块设计。四种条件策略下FID随训练步长的变化情况，可以看到应用adaLN-Zero的模型取得了最优的结果。对于后面所介绍的内容，所有模型都将使用 adaLN-Zero DiT 模块。</p>
-<p>在model size（S、B、L、XL）以及patch size（8、4、2）的空间中缩放模型，作者观察到增加模型大小和减小patch大小可以显着改进扩散模型。</p>
-<figure>
-    <img src="DiT4.jpg" srcset="/blog/img/loading.gif" lazyload alt="DiT" style="width:100%;">
-    <figcaption>图5</figcaption>
-</figure>
-
-<p>作者认为DiT的Gflops对于提高性能至关重要。图 6 的结果表明参数计数并不能唯一地确定 DiT 模型的质量。当模型大小保持不变并且补丁大小减小时，变压器的总参数实际上没有改变（实际上，总参数略有减少），并且仅 Gflops 增加。这些结果表明，缩放模型的Gflops 实际上是提高性能的关键。为了进一步研究这一点，作者在图 8 中针对模型 Gflops 绘制了 400K 训练步骤下的 FID-50K。结果表明，当总 Gflops 相似时，不同的 DiT 配置会获得相似的 FID 值（例如，DiT-S&#x2F;2 和 DiT- B&#x2F;4）。</p>
-<figure>
-    <img src="DiT5.jpg" srcset="/blog/img/loading.gif" lazyload alt="DiT" style="width:60%;">
-    <figcaption>图6</figcaption>
-</figure>
-
-<figure>
-    <img src="DiT6.jpg" srcset="/blog/img/loading.gif" lazyload alt="DiT" style="width:60%;">
-    <figcaption>图7</figcaption>
-</figure>
-
-<p>作者在之后的实验中发现，更大的模型计算效率更高，相对于训练步数较少的大型 DiT 模型而言，小型 DiT 模型即使训练时间较长，最终也会变得计算效率低下。</p>
-<p>之后作者使用最高Gflop的模型DiT-XL&#x2F;2，训练7M步，在ImageNet上达到了SOTA。</p>
-<figure>
-    <img src="DiT7.jpg" srcset="/blog/img/loading.gif" lazyload alt="DiT" style="width:80%;">
-    <figcaption>图8</figcaption>
-</figure>
-
-<figure>
-    <img src="DiT8.jpg" srcset="/blog/img/loading.gif" lazyload alt="DiT" style="width:80%;">
-    <figcaption>图9</figcaption>
-</figure>
-
-
-
-<p>最后作者还测试了采样步长对于结果的影响。在400k训练步长上，使用[16,,32,64,128,256,1000]的采样步骤绘制FID曲线。</p>
-<figure>
-    <img src="DiT9.jpg" srcset="/blog/img/loading.gif" lazyload alt="DiT" style="width:60%;">
-    <figcaption>图10</figcaption>
-</figure>
-
-<p>主要得到的结论是扩大采样步长并不能弥补模型计算量所带来的差距。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Diffusion Transformers (DiTs)，这是一种基于 Transformer 的简单扩散模型主干，其性能优于之前的 U-Net 模型，并继承了 Transformer 模型类出色的缩放特性。这将为后续的研究工作奠定基础，期待未来对于Transformer结构下扩散模型的探索。</p>
+<h3 id="视频生成"><a href="#视频生成" class="headerlink" title="视频生成"></a><strong>视频生成</strong></h3><ul>
+<li><strong>Stability AI：</strong> Stability AI <a target="_blank" rel="noopener" href="https://journal.everypixel.com/top-ai-news-november-2023">推出了 Stable Video Diffusion</a>，这是一种开创性的生成视频模型，在 GitHub 开源可访问。<a target="_blank" rel="noopener" href="https://journal.everypixel.com/ai-image-statistics">与人工智能图像生成趋势</a>相似 ，稳定视频扩散模型很可能在大部分人工智能生成视频的创建中发挥关键作用。</li>
+<li><strong>HeyGen：</strong> 人工智能初创公司推出了 <a target="_blank" rel="noopener" href="https://the-decoder.com/heygen-offers-ai-powered-video-translation-with-impressive-lip-syncing-capabilities/">一款用于语音克隆</a>、嘴唇运动调整和视频语言翻译的工具。</li>
+<li><strong>Runway Gen-2</strong>： <a target="_blank" rel="noopener" href="https://research.runwayml.com/gen2">Runway 推出了 Gen-2</a> 模型，使用户能够轻松地从文本提示、图像或其他视频生成完整的视频。看看下面的例子。 </li>
+<li><strong>Pika 和 Pika 1.0</strong>：随着最初的发布，Pika 获得了 50 万用户，每周生成数百万个视频。<a target="_blank" rel="noopener" href="https://pika.art/launch">随后Pika 1.0</a>中升级的AI模型 使用户能够创建和编辑各种风格的视频，包括3D动画、动漫、卡通和电影。</li>
+<li><strong>Meta 的编解码器头像：</strong> <a target="_blank" rel="noopener" href="https://youtu.be/MVYrJJNdrEg?si=NR3DJMeYOfbiAunX">Meta 的</a> 用于视频中 3D 人脸的像素编解码器头像 (PiCA) 模型更逼真的呈现效果。</li>
+</ul>
+<h3 id="文本生成"><a href="#文本生成" class="headerlink" title="文本生成"></a><strong>文本生成</strong></h3><p><strong>文本生成</strong></p>
+<ul>
+<li><strong>Bard 和 Gemini：</strong> <a target="_blank" rel="noopener" href="https://journal.everypixel.com/top-ai-news-march-2023">Google 的 Bard</a> 在聊天机器人领域添加了类人的情感和情绪。<a target="_blank" rel="noopener" href="https://blog.google/technology/ai/google-gemini-ai/">谷歌的 Gemini</a>引入巴德聊天机器人并在多模态数据集上进行训练， 成为“最有能力”的人工智能模型，也是 OpenAI 的 ChatGPT 最接近的竞争对手。</li>
+<li><strong>Grok：</strong> <a target="_blank" rel="noopener" href="https://journal.everypixel.com/top-ai-news-april-2023">Elon Musk 的初创公司 xAI通过</a><a target="_blank" rel="noopener" href="https://journal.everypixel.com/top-ai-news-november-2023">推出“Grok”</a> ——一个幽默、叛逆、通过 𝕏 平台提供实时知识的聊天机器人， 标志着对人工智能开发的承诺，并有可能与 OpenAI 竞争 。xAI 承诺 Grok<a target="_blank" rel="noopener" href="https://x.ai/">旨在回答</a>其他人工智能系统拒绝的挑衅性问题。</li>
+<li><strong>OverflowAI：</strong> <a target="_blank" rel="noopener" href="https://journal.everypixel.com/top-ai-news-july-2023">Stack Overflow 的 OverflowAI</a> 增强了知识管理，支持在 Visual Studio Code 和 Slack 中通过 AI 搜索相关答案。</li>
+<li><strong>Llama 2：</strong> <a target="_blank" rel="noopener" href="https://journal.everypixel.com/top-ai-news-july-2023">Meta 发布了 Llama 2</a>，这是其下一代开源大型语言模型，展示了增强的效率。Meta 经过微调的 LLM 还针对对话用例进行了优化，并且在大多数基准测试中都优于其他开源模型。</li>
+<li><strong>GPT-4：</strong> <a target="_blank" rel="noopener" href="https://journal.everypixel.com/top-ai-news-march-2023">OpenAI 的 GPT-4</a> 现在可以处理图像输入、生成字幕、分类、在来回对话中收听和响应，并支持 <a target="_blank" rel="noopener" href="https://journal.everypixel.com/top-ai-news-september-2023">实时网页浏览</a>。OpenAI 还扩展了对插件的支持，促成了一个充满开源竞争对手的环境。GPT-4 是 OpenAI 开发 AGI 之旅的下一步。</li>
+<li><strong>Mistral 7B：</strong> <a target="_blank" rel="noopener" href="https://mistral.ai/">Mistral AI</a> 今年<a target="_blank" rel="noopener" href="https://www.nytimes.com/2023/12/10/technology/mistral-ai-funding.html">估值约20亿美元</a>， 发布了Mistral 7B，这是一个挑战GPT-4和Claude 2的大型语言模型。Mistral AI强调开放的技术方法，提供免费下载其模型。</li>
+<li><strong>Mixtral 8x7B：</strong> <a target="_blank" rel="noopener" href="https://mistral.ai/news/mixtral-of-experts/">Mistral AI 还推出了 Mixtral 8x7B</a>，这是一种具有开放权重的高质量稀疏混合专家模型 (SMoE)，具有 46.7B 总参数，开创了模型的开放性，增强了真实性并减少了偏差。</li>
+<li><strong>Yi-34B llm：</strong> 今年 <a target="_blank" rel="noopener" href="https://techcrunch.com/2023/11/05/valued-at-1b-kai-fu-lees-llm-startup-unveils-open-source-model/">估值为 10 亿美元，李开复的初创公司</a><a target="_blank" rel="noopener" href="http://01.ai/">01.AI</a> 发布了 Yi-34B，这是一个开源的模型，其参数数量显着高于竞争模型，强调了其成本效益。尽管之后陷入抄袭风波，但不可否认零一万物的成功。</li>
+</ul>
+<h2 id="国内外事件时间线"><a href="#国内外事件时间线" class="headerlink" title="国内外事件时间线"></a>国内外事件时间线</h2><ul>
+<li><p>2022年11月30日，chatGPT问世。</p>
+</li>
+<li><p>2023年2月1日，chatGPT plus版本上线，OpenAI开启订阅付费计划。</p>
+</li>
+<li><p>2023年2月7日，微软将chatGPT功能集成到New Bing，当日微软市值暴涨 800 亿美元。</p>
+</li>
+<li><p>2023年2月7日，谷歌Bard首秀Demo并翻车，股票一夜之间暴跌 7000 亿人民币。</p>
+</li>
+<li><p>2023年2月24日，Meta发布LLaMa 并开源，带动了开源社区和AI社区的高速成长和发展。</p>
+</li>
+<li><p>2023年3月1日，OpenAI推出ChatGPT API，供开发者集成。</p>
+</li>
+<li><p>2023年3月14日 OpenAI发布GPT-4,并在ChatGPT和Bing中支持。</p>
+</li>
+<li><p>2023年3月14日，斯坦福发布Alpaca，一个由LLaMA 7B微调的大模型。</p>
+</li>
+<li><p>2023年3月16日 微软推出copilot（AI智能助手），重塑未来的生产方式。</p>
+</li>
+<li><p>2023年3月16日，百度发布文心一言，此后进入国内的百模大战。</p>
+</li>
+<li><p>2023年3月17日，微软GPT-4 Office全家桶发布。</p>
+</li>
+<li><p>2023年3月21日，Midjourney v5版本画出100%逼真情侣。</p>
+</li>
+<li><p>2023年3月22日，Runway 重磅发布Gen-2，文生视频里程碑。</p>
+</li>
+<li><p>2023年3月24日，OpenAI 为解除 ChatGPT 无法联网的限制，启动第三方插件支持功能。</p>
+</li>
+<li><p>2023年3月29日，千名大佬发联名信，叫停GPT-5超强大模型。</p>
+</li>
+<li><p>2023年3月31日，意大利暂时禁止ChatGPT使用，于4月28日恢复ChatGPT服务。</p>
+</li>
+<li><p>2023年4月6日，Meta发布可以分割一切的Segment Anything。</p>
+</li>
+<li><p>2023年4月20日，Google Brain与DeepMind 合并成立 Google DeepMind。</p>
+</li>
+<li><p>2023年5月5日，微软BingChat全面开放。</p>
+</li>
+<li><p>2023年7月13日，马斯克官宣成立xAI。</p>
+</li>
+<li><p>2023年7月19日，Llama 2开源可商用，模型系列包含 70 亿、130 亿和 700 亿三种参数。</p>
+</li>
+<li><p>2023年 8月10日，斯坦福「虚拟小镇」开源，引爆智能体（AI Agent）研究。</p>
+</li>
+<li><p>2023年8月29日，OpenAI发布企业版ChatGPT：没有限制、更快、更强、更安全的GPT-4。</p>
+</li>
+<li><p>2023年9月21日，OpenAI推出DALL·E 3，并将原生集成至ChatGPT中。 </p>
+</li>
+<li><p>2023年10月17日，文心大模型4.0发布。</p>
+</li>
+<li><p>2023年10月20日，ChatGPT全球宕机，API崩溃。</p>
+</li>
+<li><p>2023年10月29日，GPT-4集成图像上传 + 插件 + 代码运行器 + 文件上传 + 图像生成。</p>
+</li>
+<li><p>2023年11月15日，奥特曼被OpenAI董事会开除系列事件。</p>
+</li>
+<li><p>2023年11月29日 文生视频产品Pika 1.0正式发布。</p>
+</li>
+<li><p>2023年12月6日，谷歌DeepMind发布Gemini系列模型。</p>
+</li>
+<li><p>2023年12月14日，谷歌官宣开放Gemini API，奥特曼宣布ChatGPT Plus恢复订阅。</p>
+</li>
+<li><p>2023年12月21日，MidJounery V6 发布。</p>
+</li>
+</ul>
+<hr>
+<p>参考文章：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/kpb86Nap6sqct6HqrtJc0g">https://mp.weixin.qq.com/s/kpb86Nap6sqct6HqrtJc0g</a></p>
 
                 
               </div>
@@ -463,7 +485,7 @@
     
       <span class="category-chain">
         
-  <a href="/blog/categories/%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BB/" class="category-chain-item">论文解读</a>
+  <a href="/blog/categories/%E6%B2%89%E6%80%9D%E5%BD%95/" class="category-chain-item">沉思录</a>
   
   
 
@@ -478,9 +500,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/blog/tags/Diffusion-Model/" class="print-no-link">#Diffusion Model</a>
-      
-        <a href="/blog/tags/Transformer/" class="print-no-link">#Transformer</a>
+        <a href="/blog/tags/AI/" class="print-no-link">#AI</a>
       
     </div>
   
@@ -492,8 +512,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>论文解读——DiT|Scalable Diffusion Models with Transformers</div>
-      <div>https://jiawei804.github.io/blog/2023/12/27/2023/12/27/DiT/</div>
+      <div>2023年度AI事件</div>
+      <div>https://jiawei804.github.io/blog/2023/12/30/2023/12/30/AI大事件/</div>
     </div>
     <div class="license-meta">
       
@@ -505,7 +525,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2023年12月27日</div>
+          <div>2023年12月30日</div>
         </div>
       
       
@@ -537,18 +557,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/blog/2023/12/28/2023/12/28/DiffFIT/" title="论文解读——DiffFit|Unlocking Transferability of Large Diffusion Models via Simple Parameter-Efficient Fine-Tuning">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">论文解读——DiffFit|Unlocking Transferability of Large Diffusion Models via Simple Parameter-Efficient Fine-Tuning</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/blog/2023/12/25/2023/12/25/dgl/" title="网络的渐进成长|Deep Growing Learning">
-                        <span class="hidden-mobile">网络的渐进成长|Deep Growing Learning</span>
+                      <a href="/blog/2023/12/29/2023/12/29/CLIP/" title="论文解读——CLIP|Learning Transferable Visual Models From Natural Language Supervision">
+                        <span class="hidden-mobile">论文解读——CLIP|Learning Transferable Visual Models From Natural Language Supervision</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
