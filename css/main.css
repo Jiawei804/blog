@@ -765,7 +765,7 @@ sup > a::before,
   padding: 3rem 0;
 }
 html {
-  font-size: 18px;
+  font-size: 16px;
   letter-spacing: 0.02em;
 }
 html,
@@ -1329,7 +1329,7 @@ i.iconfont {
   padding-top: 1.45rem;
   padding-bottom: 1.45rem;
   padding-right: 1rem;
-  line-height: 1.8;
+  line-height: 1.5;
   margin-bottom: 1rem;
 }
 .markdown-body .code-wrapper {
