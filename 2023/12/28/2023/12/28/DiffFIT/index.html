@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://jiawei804.github.io/blog/images/2023/12-28.jpg">
 <meta property="article:published_time" content="2023-12-27T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-12-27T13:15:34.486Z">
+<meta property="article:modified_time" content="2023-12-30T03:17:14.193Z">
 <meta property="article:author" content="Zhang Jiawei">
 <meta property="article:tag" content="Diffusion Model">
 <meta property="article:tag" content="Efficient Training">
@@ -309,7 +309,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.1k 字
+          1.2k 字
         
       </span>
     
@@ -385,8 +385,8 @@
 </figure>
 
 <p>论文并没有太多原理性论述，作者通过大量的实验来证明以DiffFIT方式微调可以在下游数据集上得到更好的表现。</p>
-<h2 id="实验部分"><a href="#实验部分" class="headerlink" title="实验部分"></a>实验部分</h2><p>实验所选用的基础模型是DiT-XL&#x2F;2，加载在ImageNet256×256上的预训练7B次的权重，所使用的学习率是1e-4对于全量微调，评估使用的无分类器引导（cfg）为1.5，cfg为4.0用于可视化。在提出的DiffFIT上学习率放大10倍进行参数高效微调。</p>
-<h3 id="应用于下游数据集"><a href="#应用于下游数据集" class="headerlink" title="应用于下游数据集"></a>应用于下游数据集</h3><p>在Food101, SUN397, DF-20M mini, Caltech101, CUB-200-2011, ArtBench-10, Oxford Flowers and Stanford Cars 8个数据集上微调，并对比全量微调和其他微调方法，通过对比FID证明作者的微调方法更加高效。作者使用8张V100 GPUs，批大小设置为256，微调迭代240k次进行报告。</p>
+<h2 id="实验部分"><a href="#实验部分" class="headerlink" title="实验部分"></a>实验部分</h2><p>实验所选用的基础模型是DiT-XL&#x2F;2，加载在ImageNet256×256上的预训练7B大小的权重，使用学习率1e-4进行全量微调，评估使用的无分类器引导（cfg）为1.5，cfg为4.0用于可视化。在提出的DiffFIT上学习率放大10倍（1e-3）进行参数高效微调。</p>
+<h3 id="应用于下游数据集"><a href="#应用于下游数据集" class="headerlink" title="应用于下游数据集"></a>应用于下游数据集</h3><p>在Food101, SUN397, DF-20M mini, Caltech101, CUB-200-2011, ArtBench-10, Oxford Flowers and Stanford Cars 8个数据集上微调，并对比全量微调和其他微调方法，通过比较FID来证明作者的微调方法更加高效。作者使用8张V100 GPUs，批大小设置为256，微调迭代240k次进行报告。</p>
 <figure>
     <img src="DiffFIT2.jpg" srcset="/blog/img/loading.gif" lazyload alt="DiffFIT" style="width:80%;">
     <figcaption>图3: 下游数据集评测</figcaption>
@@ -401,14 +401,14 @@
 
 <p>从结果中可以看到DiffFIT微调得到了SOTA，FID值为3.02，且用更短的训练时间。</p>
 <hr>
-<p>之后作者加载预训练的IN256模型检查点在Food256上微调，并对比IN512的预训练模型上微调的结果，同时作者使用了设计的位置编码技巧作为对比。</p>
+<p>之后作者在Food512上实验，加载在预训练IN256检查点上微调的Food256的检查点（猜测这个检查点是前面所介绍的下游数据集上的实验），并对比预训练IN512检查点，以及所设计的位置编码技巧。</p>
 <figure>
     <img src="DiffFIT5.jpg" srcset="/blog/img/loading.gif" lazyload alt="DiffFIT" style="width:80%;">
     <figcaption>图5: 使用Food101对比所设计的位置编码</figcaption>
 </figure>
 
 
-<p>最终，作者发现利用预训练的 ImageNet 512×512 检查点所带来的 FID 性能与预训练的 256×256 的 ImageNet 所实现的性能相似。此外，作者观察到，通过将所提出的位置编码技巧纳入微调过程，FID 性能略有改善。</p>
+<p>最终，作者发现利用预训练的 ImageNet 512×512 检查点所带来的 FID 性能与预训练并微调的 256×256 的 ImageNet 所实现的性能相似。此外，作者观察到，通过将所提出的位置编码技巧纳入微调过程，FID 性能略有改善。</p>
 <h2 id="收敛性分析"><a href="#收敛性分析" class="headerlink" title="收敛性分析"></a>收敛性分析</h2><p>在上述实验基础上，为了观察模型收敛情况，作者每15k次迭代计算FID分数。</p>
 <figure>
     <img src="DiffFIT6.jpg" srcset="/blog/img/loading.gif" lazyload alt="DiffFIT" style="width:80%;">
@@ -526,8 +526,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/blog/2023/12/27/2023/12/27/DiT/" title="论文解读——Scalable Diffusion Models with Transformers（DiT）">
-                        <span class="hidden-mobile">论文解读——Scalable Diffusion Models with Transformers（DiT）</span>
+                      <a href="/blog/2023/12/27/2023/12/27/DiT/" title="论文解读——DiT|Scalable Diffusion Models with Transformers">
+                        <span class="hidden-mobile">论文解读——DiT|Scalable Diffusion Models with Transformers</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
