@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://jiawei804.github.io/blog/images/2023/12-29.jpg">
 <meta property="article:published_time" content="2023-12-28T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-12-28T03:45:42.878Z">
+<meta property="article:modified_time" content="2023-12-30T03:20:45.464Z">
 <meta property="article:author" content="Zhang Jiawei">
 <meta property="article:tag" content="zero-shot">
 <meta property="article:tag" content="transfer learning">
@@ -365,7 +365,7 @@
                 <h1 id="论文解读——CLIP-Learning-Transferable-Visual-Models-From-Natural-Language-Supervision"><a href="#论文解读——CLIP-Learning-Transferable-Visual-Models-From-Natural-Language-Supervision" class="headerlink" title="论文解读——CLIP|Learning Transferable Visual Models From Natural Language Supervision"></a>论文解读——CLIP|Learning Transferable Visual Models From Natural Language Supervision</h1><blockquote>
 <p>摘要：本篇论文是OpenAI在多模态领域的成果之一，CLIP（Contrastive LanguageImage Pre-training）连接了文本和图像，旨在将同一语义的文字和图片转化到同一个隐空间下。论文主要贡献：</p>
 <p>1.论文使用在互联网上收集的4亿个图像文本对的数据集从头训练一个模型，这种预测标题（文本）与图像的对应的预训练更像是一种广泛的监督学习，高效且可扩展。</p>
-<p>2.在预训练好的模型上，能够实现zero-shot学习应用于下游任务。例如，在 ImageNet 零样本上可以媲美原始 ResNet50 的准确性（分类任务），而无需使用其所训练的 128 万个训练样本中的任何一个。</p>
+<p>2.在预训练好的模型上，能够实现zero-shot学习应用于下游任务。例如，在 ImageNet 零样本上可以媲美标准 ResNet50 的准确性（分类任务），而无需使用其所训练的 128 万个训练样本中的任何一个。</p>
 <p>3.CLIP推动了基于文字引导的文字生成图像技术在图像生成领域的快速发展，是后续DALLE、Imagen、stable diffusion的基石。</p>
 </blockquote>
 <h2 id="CLIP如何将图像与文本映射到同一潜空间？"><a href="#CLIP如何将图像与文本映射到同一潜空间？" class="headerlink" title="CLIP如何将图像与文本映射到同一潜空间？"></a>CLIP如何将图像与文本映射到同一潜空间？</h2><p>在最开始，作者模仿之前类似的工作，通过训练一个图像CNN和一个文本Transformer来预测图像标题，但是很难继续扩展研究，并且Transformer模型的计算量已经是原始ResNet50的两倍之多。</p>
