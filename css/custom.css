@@ -1,5 +1,5 @@
 /*INFO 段落行间距设置*/
 .post-content p {
-    line-height: 2.0;
+    line-height: 1.0;
     text-align: justify;
 }
