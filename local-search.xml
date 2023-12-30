@@ -116,7 +116,7 @@
     <link href="/blog/2023/12/23/2023/12/23/cfg/"/>
     <url>/blog/2023/12/23/2023/12/23/cfg/</url>
     
-    <content type="html"><![CDATA[<p><a href="https://getimg.ai/guides/interactive-guide-to-stable-diffusion-guidance-scale-parameter">原文链接</a><br><span style="color: red;">请阅读原文，这里只是为了自己回顾，原文内容更精彩 。</span></p><p>简单来说，CFG尺度（无分类器引导尺度）或引导尺度<span style="color: green;">(“CFG scale (classifier-free guidance scale) or guidance scale”)</span>是一个控制图像生成过程遵循文本提示程度的参数。 值越高，图像越贴近给定的文本输入。</p><p>但这并不意味着该值应始终设置为最大值，因为更多的指导意味着更少的多样性和质量。</p><p>展示了同代“熊猫弹吉他”不同指导值。</p><p>当指导比例值设置为1时，文本提示将被忽略。严格遵循最大20，但图像质量较差。 最具“创意”和“艺术性”的结果通常在 7-12 的指导范围内生成。 但使用高达 15 的比例仍然会产生几乎没有伪影的结果。</p><p>设置正确的值取决于您想要的结果以及文本提示的复杂性。 决定权在于您，但最好总是尝试不同的规模，看看更有创意的结果或严格遵守提示的结果是否更适合您的用例。</p><p>如果您尝试生成提示中指定的更微小细节的图像，则可以从 12 到 16 之间的更高指导比例开始。</p><p>我们希望我们的指南能帮助您了解稳定扩散中的 CFG 比例&#x2F;引导比例参数，并且您将利用所学知识来创造令人惊叹的东西。</p>]]></content>
+    <content type="html"><![CDATA[<p><a href="https://getimg.ai/guides/interactive-guide-to-stable-diffusion-guidance-scale-parameter">原文链接</a></p><p>简单来说，CFG尺度（无分类器引导尺度）或引导尺度<span style="color: green;">(“CFG scale (classifier-free guidance scale) or guidance scale”)</span>是一个控制图像生成过程遵循文本提示程度的参数。 值越高，图像越贴近给定的文本输入。</p><p>但这并不意味着该值应始终设置为最大值，因为更多的指导意味着更少的多样性和质量。</p><p>当指导比例值设置为1时，文本提示将被忽略。严格遵循最大20，但图像质量较差。 最具“创意”和“艺术性”的结果通常在 7-12 的指导范围内生成。 但使用高达 15 的比例仍然会产生几乎没有artifacts的结果。</p><p>设置正确的值取决于您想要的结果以及文本提示的复杂性。 决定权在于您，但最好总是尝试不同的规模，看看更有创意的结果或严格遵守提示的结果是否更适合您的用例。</p><p>如果您尝试生成提示中指定的更微小细节的图像，则可以从 12 到 16 之间的更高指导比例开始。</p><p>我们希望我们的指南能帮助您了解稳定扩散中的 CFG 比例&#x2F;引导比例参数，并且您将利用所学知识来创造令人惊叹的东西。</p>]]></content>
     
     
     <categories>
