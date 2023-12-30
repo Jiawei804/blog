@@ -1329,7 +1329,7 @@ i.iconfont {
   padding-top: 1.45rem;
   padding-bottom: 1.45rem;
   padding-right: 1rem;
-  line-height: 1.8;
+  line-height: 1.5;
   margin-bottom: 1rem;
 }
 .markdown-body .code-wrapper {
@@ -1391,7 +1391,7 @@ figure.highlight td.code > pre {
 }
 .markdown-body {
   font-size: 1rem;
-  line-height: 1.8;
+  line-height: 1.6;
   font-family: var(--font-family-sans-serif);
   margin-bottom: 2rem;
   color: var(--post-text-color);
