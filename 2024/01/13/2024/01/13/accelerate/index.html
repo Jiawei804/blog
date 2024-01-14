@@ -1,0 +1,1240 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/images/fluid.png">
+  <link rel="icon" href="/blog/images/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#93b5cf">
+  <meta name="author" content="Zhang Jiawei">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Huggingface|Accelerate学习笔记PyTorch 很灵活。 它允许您根据需要自定义它。 这意味着您还必须处理所有低级硬件自定义，而在 95% 的项目中您实际上并不关心这些。PyTorch 的主要痛点之一是使代码适应各种硬件配置（CPU&#x2F;GPU&#x2F;TPU）。 您必须维护大量用于混合精度训练、梯度累积等的模版代码。尽管一些高级库完全抽象了所有工程组件（包括训练循环）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="学习笔记|Huggingface Accelerate">
+<meta property="og:url" content="https://jiawei804.github.io/blog/2024/01/13/2024/01/13/accelerate/index.html">
+<meta property="og:site_name" content="Jiawei&#39;s Blog">
+<meta property="og:description" content="Huggingface|Accelerate学习笔记PyTorch 很灵活。 它允许您根据需要自定义它。 这意味着您还必须处理所有低级硬件自定义，而在 95% 的项目中您实际上并不关心这些。PyTorch 的主要痛点之一是使代码适应各种硬件配置（CPU&#x2F;GPU&#x2F;TPU）。 您必须维护大量用于混合精度训练、梯度累积等的模版代码。尽管一些高级库完全抽象了所有工程组件（包括训练循环）">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://jiawei804.github.io/blog/images/2024/1-13.jpg">
+<meta property="article:published_time" content="2024-01-12T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-01-14T12:34:38.057Z">
+<meta property="article:author" content="Zhang Jiawei">
+<meta property="article:tag" content="huggingface">
+<meta property="article:tag" content="accelerate">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://jiawei804.github.io/blog/images/2024/1-13.jpg">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>学习笔记|Huggingface Accelerate - Jiawei&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/blog/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/blog/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/blog/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"jiawei804.github.io","root":"/blog/","version":"1.9.6","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":"4016bcd321494fdaa4814573925fc604","google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/blog/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+  
+
+  
+    <!-- Baidu Analytics -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?4016bcd321494fdaa4814573925fc604";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+      }
+    </script>
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/blog/">
+      <strong>jiaweijson</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="iconfont icon-link-fill"></i>
+                <span>链接</span>
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="https://jiawei804.github.io/homepage/" target="_self">
+                    
+                    <span>学术主页</span>
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="https://500px.com.cn/JiaweiZhang/" target="_self">
+                    
+                    <span>摄影</span>
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/blog/images/2024/1-13-cover.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="学习笔记|Huggingface Accelerate"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-01-13 00:00" pubdate>
+          2024年1月13日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          38 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">学习笔记|Huggingface Accelerate</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="Huggingface-Accelerate学习笔记"><a href="#Huggingface-Accelerate学习笔记" class="headerlink" title="Huggingface|Accelerate学习笔记"></a>Huggingface|Accelerate学习笔记</h1><p>PyTorch 很灵活。 它允许您根据需要自定义它。 这意味着您还必须处理所有低级硬件自定义，而在 95% 的项目中您实际上并不关心这些。<br>PyTorch 的主要痛点之一是使代码适应各种硬件配置（CPU&#x2F;GPU&#x2F;TPU）。 您必须维护大量用于混合精度训练、梯度累积等的模版代码。尽管一些高级库完全抽象了所有工程组件（包括训练循环），但您仍然需要熟悉它们的 API 。 您还必须学习特定的方法和函数来覆盖它们以注入您的自定义行为。<br>但是，如果有一个库仅抽象出多 GPU&#x2F;TPU&#x2F;fp16 所需的样板代码并允许您完全按原样使用原始 PyTorch 代码呢？ HuggingFace Accelerate 就是专门为此目的而创建的！<br>在本文中，我们将了解 HuggingFace Accelerate 所提供的功能以及执行分布式训练&#x2F;评估以及权重和偏差集成是多么简单。<br>这是我们将要介绍的内容：</p>
+<ul>
+<li><p>你为什么要使用Huggingface Accelerate？</p>
+</li>
+<li><p>安装并配置Huggingface Accelerate</p>
+</li>
+<li><p>对比：典型pytorch训练循环</p>
+</li>
+<li><p>对比：Huggingface Accelerate训练循环</p>
+</li>
+<li><p>Accelerate类</p>
+</li>
+<li><p>梯度累积</p>
+</li>
+<li><p>梯度裁剪</p>
+</li>
+<li><p>分布式评估</p>
+</li>
+<li><p>执行过程</p>
+</li>
+<li><p>打印</p>
+</li>
+<li><p>延迟执行</p>
+</li>
+<li><p>保存加载模型</p>
+</li>
+<li><p>日志</p>
+</li>
+<li><p>运行分布式代码</p>
+</li>
+<li><p>其他功能</p>
+</li>
+</ul>
+<h2 id="为什么应该使用-HuggingFace-Accelerate？"><a href="#为什么应该使用-HuggingFace-Accelerate？" class="headerlink" title="为什么应该使用 HuggingFace Accelerate？"></a>为什么应该使用 HuggingFace Accelerate？</h2><p>在继续阅读本文之前，您可能会对为什么应该首先使用 Accelerate 有疑问。 它实际上解决了什么问题？<br>Accelerate 解决的主要问题是分布式训练。 例如，在项目开始时，您可能会在单个 GPU 上运行模型来测试某些内容，但随着项目的发展加速您的训练，您可能会觉得需要将现有代码扩展到多 GPU 系统 。<br>在这种情况下，您实际上可以使用完全相同的代码通过 HuggingFace Accelerate 在 CPU&#x2F;GPU&#x2F;多 GPU&#x2F;TPU 上进行训练，而这对于纯 PyTorch 来说是不可能的。 在那里，您必须编写一堆 if-else 语句，以使您的管道足够强大，可以在任何类型的训练设置上运行。 如果您想调试 PyTorch 代码，那么在 CPU 上运行代码通常会很有帮助，因为它会产生更有意义的错误，而不是在 GPU 上。<br>啊，但是等等，还有更多。 以下列出了使用 Accelerate 的其他一些优势：</p>
+<ul>
+<li><p>您可以删除处理不同训练设置（CPU&#x2F;GPU&#x2F;TPU）所需的样板代码。</p>
+</li>
+<li><p>您还可以使用相同的代码在 CPU、GPU、多 GPU 和多节点上进行训练。</p>
+</li>
+<li><p>这是进行分布式评估的便捷方法。</p>
+</li>
+<li><p>允许您删除混合精度和梯度累积所需的样板。</p>
+</li>
+<li><p>增强分布式系统中的日志记录和跟踪。</p>
+</li>
+<li><p>可以方便地保存分布式系统中的训练状态。</p>
+</li>
+<li><p>完全分片的数据并行训练。</p>
+</li>
+<li><p>集成DeepSpeed。</p>
+</li>
+<li><p>集成各种实验跟踪器（ex: Weights &amp; Biases），以便方便地记录分布式系统。</p>
+</li>
+<li><p>附带一个方便的 CLI 命令，用于启动分布式训练。</p>
+</li>
+<li><p>在 Jupyter Notebook 中启动分布式训练的便捷功能。</p>
+</li>
+</ul>
+<p>我们将在本文中一一研究这些功能。</p>
+<h2 id="安装和配置-HuggingFace-Accelerate"><a href="#安装和配置-HuggingFace-Accelerate" class="headerlink" title="安装和配置 HuggingFace Accelerate"></a>安装和配置 HuggingFace Accelerate</h2><p>当然，在使用 HuggingFace Accelerate 之前，您必须安装它。 您可以通过 pip 或 conda 来完成：</p>
+<div class="code-wrapper"><pre><code class="hljs bash">pip install accelerate
+OR
+conda install -c conda-forge accelerate</code></pre></div>
+
+<p>Accelerate 是一个快速更新的库，每天都会添加新功能。 我更喜欢从 GitHub 存储库安装它以使用尚未发布的功能。 您可以通过在终端中运行以下命令来执行此操作：</p>
+<div class="code-wrapper"><pre><code class="hljs bash">pip install git+https://github.com/huggingface/accelerate</code></pre></div>
+
+<p>安装 Accelerate 后，您应该为当前系统配置它。 为此，请运行以下命令并回答提示的问题：</p>
+<div class="code-wrapper"><pre><code class="hljs bash">accelerate config</code></pre></div>
+
+<p>如果您不想配置这些文件，<code>accelerate config default</code>可以快速完成对accelerate的配置。</p>
+<p>完成后，要检查您的配置是否正常，您可以运行：</p>
+<div class="code-wrapper"><pre><code class="hljs bash">accelerate <span class="hljs-built_in">env</span></code></pre></div>
+
+<p>下面是一个示例输出，它描述了一台机器上使用混合精度的两个 GPU。</p>
+<div class="code-wrapper"><pre><code class="hljs bash">- `Accelerate` version: 0.11.0.dev0
+- Platform: Linux-5.10.0-15-cloud-amd64-x86_64-with-debian-11.3
+- Python version: 3.7.12
+- Numpy version: 1.19.5
+- PyTorch version (GPU?): 1.12.0+cu102 (True)
+- `Accelerate` default config:
+        - compute_environment: LOCAL_MACHINE
+        - distributed_type: MULTI_GPU
+        - mixed_precision: fp16
+        - use_cpu: False
+        - num_processes: 2
+        - machine_rank: 0
+        - num_machines: 1
+        - main_process_ip: None
+        - main_process_port: None
+        - main_training_function: main
+        - deepspeed_config: &#123;&#125;
+        - fsdp_config: &#123;&#125;</code></pre></div>
+
+<h2 id="比较与对比：典型的-PyTorch-训练循环"><a href="#比较与对比：典型的-PyTorch-训练循环" class="headerlink" title="比较与对比：典型的 PyTorch 训练循环"></a>比较与对比：典型的 PyTorch 训练循环</h2><p>以下是您必须熟悉的基本 PyTorch 训练循环：</p>
+<div class="code-wrapper"><pre><code class="hljs python">device = torch.device(<span class="hljs-string">&#x27;cuda&#x27;</span> <span class="hljs-keyword">if</span> torch.cuda.is_available() <span class="hljs-keyword">else</span> <span class="hljs-string">&#x27;cpu&#x27;</span>)
+<span class="hljs-keyword">for</span> batch <span class="hljs-keyword">in</span> training_dataloader:
+    optimizer.zero_grad()
+    inputs, targets = batch
+    inputs = inputs.to(device)
+    targets = targets.to(device)
+    outputs = model(inputs)
+    loss = loss_function(outputs, targets)
+    optimizer.step()
+    scheduler.step()</code></pre></div>
+
+<p>这是一个基本的训练循环，只能在 CPU 或单个 GPU 上运行（而且，它不支持混合精度和梯度累积等现代技术）。<br>为了实现分布式训练和fp16&#x2F;梯度累积，你需要添加一堆if-else语句，这使得代码难以维护并且容易出错。<br>接下来，您将看到🤗 Accelerate 如何让您无缝集成多 GPU&#x2F;TPU&#x2F;多节点训练，同时只需几行额外代码即可支持混合精度和梯度累积。</p>
+<h2 id="比较和对比：HuggingFace-加速训练循环"><a href="#比较和对比：HuggingFace-加速训练循环" class="headerlink" title="比较和对比：HuggingFace 加速训练循环"></a>比较和对比：HuggingFace 加速训练循环</h2><div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">from</span> accelerate <span class="hljs-keyword">import</span> Accelerator
+accelerator = Accelerator()
+
+
+model, optimizer, training_dataloader, scheduler = accelerator.prepare(
+     model, optimizer, training_dataloader, scheduler
+)
+
+
+<span class="hljs-keyword">for</span> batch <span class="hljs-keyword">in</span> training_dataloader:
+    optimizer.zero_grad()
+    inputs, targets = batch
+    outputs = model(inputs)
+    loss = loss_function(outputs, targets)
+    accelerator.backward(loss)
+    optimizer.step()
+    scheduler.step()
+</code></pre></div>
+
+<p>上面的训练循环能够在CPU&#x2F;GPU&#x2F;多GPU&#x2F;TPU&#x2F;多节点上运行。 请注意，只需很少的改变即可将现有的原始 PyTorch 代码转换为更强大的形式，可以轻松扩展到您想要的任何硬件！<br>让我们更详细地看看上面的训练循环。<br>首先，我们导入 Accelerator 主类并实例化它：</p>
+<div class="code-wrapper"><pre><code class="hljs pyth">from accelerate import Accelerator
+
+accelerator = Accelerator()</code></pre></div>
+
+<blockquote>
+<p>注意：Accelerator 类应该在脚本开始时实例化，或者尽早实例化，以便在整个脚本中使用 Accelerator 提供的方便的函数&#x2F;方法。</p>
+</blockquote>
+<p>您应该删除所有现有的 .cuda() 或 .to(device) 调用。 加速器对象将自动为您处理此问题，并将这些对象放置在正确的设备上。<br>如果您出于某种原因想要停用自动设备放置并且想要自己执行此操作，则可以通过在初始化 Accelerator 类时传递 device_placement&#x3D;False 来停用它。<br>接下来，您需要将模型、优化器、训练&#x2F;验证数据加载器和学习率调度程序传递给 Accelerator.prepare() 方法。 对象提供给prepare() 方法的顺序并不重要——重要的是它们按照传递的顺序解包。 这将为训练做好一切准备。<br>例如，HuggingFace Accelerate 会将数据加载器分片到所有可用的 GPU&#x2F;TPU 核心上，以便每个核心看到训练数据集的不同部分。 此外，所有进程的随机状态将在每次迭代开始时同步。</p>
+<blockquote>
+<p>实际批量大小将是所使用的设备数量乘以您在脚本中设置的批量大小。 例如：在创建训练数据加载器时使用 4 个 GPU 进行训练，批量大小为 16，这将有效地在实际批量大小为 16*4 &#x3D; 64 的情况下进行训练。</p>
+</blockquote>
+<blockquote>
+<p>仅当调度器（scheduler）需要在每个优化器步骤中逐步执行时，才应将学习率调度程序传递给prepare()。</p>
+</blockquote>
+<p>此外，如果您正在分布式设置上进行训练，您的训练数据加载器长度可能会发生变化。 因此，任何使用训练数据加载器长度的指令（例如：如果您想记录训练步骤的总数）都应该在prepare()方法之后调用。<br>您可能会注意到，Accelerator 是将完整的 HuggingFace Accelerate 框架绑定在一起的主类。 事实上，让我们详细看看。</p>
+<h2 id="Accelerate类"><a href="#Accelerate类" class="headerlink" title="Accelerate类"></a>Accelerate类</h2><p>Accelerator 类是这个完整框架的关键，它还有一些有用的方法，您将在本文的后续部分中看到。 Accelerate 类在实例化时采用的最重要的参数如下所述：</p>
+<ul>
+<li><p><code>device_placement</code>：如果您希望 Accelerate 自动将对象放置在适当的设备上，请设置为 True。 理想情况下，应该打开此功能。 您可以将其关闭以手动放置对象。</p>
+</li>
+<li><p><code>split_batches</code>：如果设置为 True，则批次将跨设备拆分。 例如：如果您在启动数据加载器时在 4-GPU 机器上进行训练，批量大小为1有4个数据的数据集，则每个 GPU 上的实际批量大小将为 4&#x2F;4 &#x3D; 1。如果设置为 False，则有效 所有 GPU 的批量大小将为 4*4 &#x3D; 16。理想情况下，应将其设置为 False。</p>
+</li>
+<li><p><code>mix_ precision</code>： Accelerate 自动处理混合精度逻辑，您无需编写 if-else 语句即可在混合精度和全精度之间切换。 传递“no”以禁用混合精度。 要启用混合精度，只需传递“fp16”即可。 Accelerate 还支持 bf16（通过“bf16”来启用它）。</p>
+</li>
+<li><p><code>gradient_accumulation_steps</code>：🤗 Accelerate 还会自动处理梯度累积逻辑，减少大量样板代码。 只需传递梯度累积步骤的数量，Accelerate 将通过上下文管理器（with accelerator.accumulate）完成其余的工作，正如您将在本文后面看到的那样。</p>
+</li>
+<li><p><code>cpu</code>：如果为 True，则即使 GPU 可用，也会强制在 CPU 上进行训练。 对于调试目的很有用。</p>
+</li>
+<li><p><code>log_with</code>：用于记录的实验跟踪器。 要使用W&amp;B ，请传递 wandb，您就可以使用 W&amp;B 进行实验跟踪。</p>
+</li>
+<li><p><code>Accelerate</code> 的方法还有很多，这里不可能一一涵盖。 官方文档非常好，您可以查看参数。</p>
+</li>
+</ul>
+<h2 id="进行梯度累积"><a href="#进行梯度累积" class="headerlink" title="进行梯度累积"></a>进行梯度累积</h2><p>如果您需要训练更大的批量大小但 GPU 内存有限，梯度累积是一个不错的策略。<br>梯度累积通过累积指定步数的梯度来模拟更大的批量大小。 要在 HuggingFace Accelerate 中使用梯度累积，您只需在启动 Accelerator 类时将gradient_accumulation_steps 传递到所需的数字，并将训练循环包装在accumulate() 上下文管理器中。<br>这是启用梯度累积的 HuggingFace Accelerate 训练循环：</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">from</span> accelerate <span class="hljs-keyword">import</span> Accelerator
+
+accelerator = Accelerator(gradient_accumulation_steps=<span class="hljs-number">2</span>)
+
+model, optimizer, training_dataloader, scheduler = accelerator.prepare(
+     model, optimizer, training_dataloader, scheduler
+)
+
+<span class="hljs-keyword">for</span> batch <span class="hljs-keyword">in</span> training_dataloader:
+    <span class="hljs-comment"># accumulate context manager</span>
+    <span class="hljs-keyword">with</span> accelerate.accumulate(model):	<span class="hljs-comment"># you can also use accelerator.accumulate</span>
+        optimizer.zero_grad()
+        inputs, targets = batch
+        outputs = model(inputs)
+        loss = loss_function(outputs, targets)
+        accelerator.backward(loss)
+        optimizer.step()
+        scheduler.step()</code></pre></div>
+
+<h2 id="执行梯度裁剪"><a href="#执行梯度裁剪" class="headerlink" title="执行梯度裁剪"></a>执行梯度裁剪</h2><p>梯度裁剪是一种有用的技术，可以避免神经网络中梯度爆炸问题。 如果您要执行混合精度的梯度裁剪，则应首先取消缩放梯度。<br>以下是 PyTorch 文档中的声明：</p>
+<blockquote>
+<p>所有由scaler.scale(loss).backward()产生的梯度都会被缩放。 如果你想修改或检查backward()和scaler.step(optimizer)之间参数的.grad属性，你应该首先取消缩放它们。 例如，梯度裁剪操作一组梯度，使其全局范数（参见 torch.nn.utils.clip_grad_norm_()）或最大幅度（参见 torch.nn.utils.clip_grad_value_()）&lt;&#x3D;某个用户施加的阈值 。 如果您尝试在不取消缩放的情况下进行clip，则梯度的范数&#x2F;最大幅度也会缩放，因此您请求的阈值（这意味着未缩放梯度的阈值）将无效。</p>
+</blockquote>
+<blockquote>
+<p>unscale_ 只能在每个优化器的每个step调用中调用一次，并且只能在该优化器分配的参数的所有梯度都已累积之后调用。 在每个step之间对给定优化器调用 unscale_ 两次会触发运行时错误。</p>
+</blockquote>
+<p>纯 PyTorch 中混合精度和梯度裁剪的训练循环如下所示：</p>
+<div class="code-wrapper"><pre><code class="hljs python">scaler = GradScaler()
+
+<span class="hljs-keyword">for</span> epoch <span class="hljs-keyword">in</span> epochs:
+    <span class="hljs-keyword">for</span> <span class="hljs-built_in">input</span>, target <span class="hljs-keyword">in</span> data:
+        optimizer.zero_grad()
+        <span class="hljs-keyword">with</span> autocast():
+            output = model(<span class="hljs-built_in">input</span>)
+            loss = loss_fn(output, target)
+        scaler.scale(loss).backward()
+
+        <span class="hljs-comment"># Unscales the gradients of optimizer&#x27;s assigned params in-place</span>
+        scaler.unscale_(optimizer)
+
+        <span class="hljs-comment"># Since the gradients of optimizer&#x27;s assigned params are unscaled, clips as usual:</span>
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm)
+
+        <span class="hljs-comment"># optimizer&#x27;s gradients are already unscaled, so scaler.step does not unscale them,</span>
+        <span class="hljs-comment"># although it still skips optimizer.step() if the gradients contain infs or NaNs.</span>
+        scaler.step(optimizer)
+
+        <span class="hljs-comment"># Updates the scale for next iteration.</span>
+        scaler.update()
+</code></pre></div>
+
+<p>正如您所看到的，在我们的训练循环中同时使用混合精度、梯度裁剪和梯度累积可能会导致大量的样板代码。 结果，代码维护变得更加困难。<br>幸运的是，使用 HuggingFace Accelerate 可以更有效地完成梯度裁剪：</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">from</span> accelerate <span class="hljs-keyword">import</span> Accelerator
+
+
+max_grad_norm = <span class="hljs-number">1.0</span>
+accelerator = Accelerator(mixed_precision=<span class="hljs-string">&quot;fp16&quot;</span>, gradient_accumulation_steps=<span class="hljs-number">2</span>)
+
+
+model, optimizer, training_dataloader, scheduler = accelerator.prepare(
+     model, optimizer, training_dataloader, scheduler
+)
+
+
+<span class="hljs-keyword">for</span> batch <span class="hljs-keyword">in</span> training_dataloader:
+    <span class="hljs-comment"># accumulate context manager (for gradient accumulation)</span>
+    <span class="hljs-keyword">with</span> accelerate.accumulate(model):
+        optimizer.zero_grad()
+        inputs, targets = batch
+        outputs = model(inputs)
+        loss = loss_function(outputs, targets)
+        accelerator.backward(loss)
+	<span class="hljs-comment"># gradient clipping</span>
+	<span class="hljs-keyword">if</span> accelerator.sync_gradients:
+            accelerator.clip_grad_norm_(model.parameters(), max_grad_norm)
+        optimizer.step()
+        scheduler.step()</code></pre></div>
+
+<p>上面的训练循环执行混合精度训练、梯度累积和梯度裁剪。 请注意，与纯 PyTorch 训练循环相比，训练循环看起来多么干净。<br>让我们深入研究一下梯度裁剪部分发生了什么：<br><code>Accelerator.sync_gradients</code> 检查梯度当前是否在所有进程之间同步。 您应该使用 <code>Accelerator.clip_grad_norm_ </code>而不是 <code>torch.nn.utils.clip_grad_norm_ </code>。 在幕后，Accelerate 的 <code>Clip_grad_norm_ </code>在剪切梯度之前执行梯度缩放。 您可以查看源代码，并查看上述所讨论概念的问题。</p>
+<h2 id="执行分布式评估"><a href="#执行分布式评估" class="headerlink" title="执行分布式评估"></a>执行分布式评估</h2><p>如果您以前曾经尝试过使用纯 PyTorch 执行分布式评估，那么您就会知道它有多么具有挑战性。 HuggingFace Accelerate 提供了一种尽可能轻松地执行分布式评估的便捷方法。<br>您可以使用 HuggingFace Accelerate 的 <code>Gather_for_metrics()</code> 方法从所有进程中收集所有预测和标签以计算指标。 此外，<code>gather_for_metrics()</code> 会删除最后一批中的重复项，因为数据集末尾的某些数据可能会重复，以便批次可以在所有workers之间平均分配。 Gather_for_metrics() 会在收集时自动删除重复的数据，以便您的指标计算正确。 这是演示分布式评估的简短代码片段。</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">for</span> inputs, targets <span class="hljs-keyword">in</span> validation_dataloader:
+    predictions = model(inputs)
+    <span class="hljs-comment"># Gather all predictions and targets</span>
+    all_predictions, all_targets = accelerator.gather_for_metrics((predictions, targets))
+    metrics = calculate_metrics(all_predictions, all_targets)</code></pre></div>
+
+<p>如果您不想执行分布式评估而只想执行分布式训练，那么您可以将验证数据加载器保留在prepare()方法之外。</p>
+<h2 id="执行流程"><a href="#执行流程" class="headerlink" title="执行流程"></a>执行流程</h2><p>HuggingFace Accelerate 还提供了一些方便的方法来在分布式系统上执行您可能喜欢的流程。<br>以下大部分内容取自此处的 Accelerate 文档。</p>
+<h3 id="在每个server上执行"><a href="#在每个server上执行" class="headerlink" title="在每个server上执行"></a>在每个server上执行</h3><p>如果您使用多个server并且希望某些内容在每个server（节点）上执行一次，那么您可以使用 <code>is_local_main_process</code>。</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">if</span> accelerator.is_local_main_process:
+    do_thing_once_per_server()</code></pre></div>
+
+
+<p>大多数加速器方法也有一个可供您使用的装饰器对应项。 例如，您可以使用 <code>on_local_main_process()</code> 装饰器包装函数，以在函数执行时实现相同的行为：</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-meta">@accelerator.on_local_main_process</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">do_my_thing</span>():
+    <span class="hljs-string">&quot;Something done once per server&quot;</span>
+    do_thing_once_per_server()</code></pre></div>
+
+<h3 id="仅在一个server执行"><a href="#仅在一个server执行" class="headerlink" title="仅在一个server执行"></a>仅在一个server执行</h3><p>对于只应在所有servers上执行一次的语句（即多节点情况下只有一个节点上的一个进程是主进程），请使用 <code>is_main_process</code>：</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">if</span> accelerator.is_main_process:
+    do_thing_once()</code></pre></div>
+
+<p>同样，您可以使用装饰器对应部分来包装函数的执行：</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-meta">@accelerator.on_main_process</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">do_my_thing</span>():
+    <span class="hljs-string">&quot;Something done once per server&quot;</span>
+    do_thing_once()</code></pre></div>
+
+<p>关于具体流程<br>如果一个函数应该在特定的硬件或本地进程index上运行，则有类似的装饰器可以实现此目的：</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-meta">@accelerator.on_local_process(<span class="hljs-params">local_process_idx=<span class="hljs-number">0</span></span>)</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">do_my_thing</span>():
+    <span class="hljs-string">&quot;Something done on process index 0 on each server&quot;</span>
+    do_thing_on_index_zero_on_each_server()</code></pre></div>
+
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-meta">@accelerator.on_process(<span class="hljs-params">process_index=<span class="hljs-number">0</span></span>)</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">do_my_thing</span>():
+    <span class="hljs-string">&quot;Something done on process index 0&quot;</span>
+    do_thing_on_index_zero()</code></pre></div>
+
+<h2 id="打印"><a href="#打印" class="headerlink" title="打印"></a>打印</h2><p>在每个进程上打印并不是一个好主意，因为它会堵塞控制台日志并使它们无法读取。 为了每个进程只打印一次，HuggingFace Accelerate 有它的 print 方法，这是一种打印东西的便捷方法。 用 Accelerate 的打印方法替换常用的打印。 在底层，它只是检查进程是否是本地主进程。 </p>
+<div class="code-wrapper"><pre><code class="hljs python">accelerator.<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;My thing I want to print!&quot;</span>)</code></pre></div>
+
+<h2 id="等待（Deferring）执行"><a href="#等待（Deferring）执行" class="headerlink" title="等待（Deferring）执行"></a>等待（Deferring）执行</h2><p>有时您可能需要推迟（推迟）一些执行。 当您运行 Python 脚本时，指令会按顺序执行。 当您处于分布式设置（即在多个 GPU 上运行脚本）时，每个进程（或 GPU）将按顺序执行所有指令。 某些进程可能比其他进程更快地执行指令。<br>您可能需要等待所有进程到达某个点，然后再执行进一步的指令。 例如，在保存模型之前，您应该确保所有进程都已执行指令（即所有进程都应该完成训练）。 要等待所有进程到达脚本中的某个点，您可以在该特定点使用 Accelerate 的 <code>wait_for_everyone()</code> 。</p>
+<div class="code-wrapper"><pre><code class="hljs python">accelerator.wait_for_everyone()</code></pre></div>
+
+<p>该指令将阻塞所有首先到达的进程，直到所有其他进程都到达该点。</p>
+<h2 id="保存和加载状态"><a href="#保存和加载状态" class="headerlink" title="保存和加载状态"></a>保存和加载状态</h2><p>如果您想在脚本开始时保存在prepare()方法中传递的任何对象&#x2F;模型，您应该使用<code>unwrap_model()</code>来删除在分布式过程中添加的所有特殊模型包装器。 您应该使用 Accelerate 的 <code>save()</code> 而不是 <code>torch.save()</code>。 在幕后，Accelerate 的 <code>save()</code> 方法为每台机器或服务器保存一次对象。 您可以查看源代码。 此外，在使用 <code>wait_for_everyone()</code> 保存模型之前，暂停已完成的进程直到所有进程完成（如上一节所述）也很有用。 这是一个严格遵循上述要点的简短示例。</p>
+<div class="code-wrapper"><pre><code class="hljs python">model = MyModel()
+model = accelerator.prepare(model)
+accelerator.wait_for_everyone()
+<span class="hljs-comment"># Unwrap</span>
+model = accelerator.unwrap_model(model)
+state_dict = model.state_dict()
+<span class="hljs-comment"># Use accelerator.save()</span>
+accelerator.save(state_dict, <span class="hljs-string">&quot;my_state.pkl&quot;</span>)</code></pre></div>
+
+<p>您可能经常想保存并在之后继续训练状态。 这样做需要保存和加载模型、优化器、RNG 生成器和 GradScaler。 HuggingFace Accelerate 内部有两个方便的功能可以快速实现这一目标：</p>
+<ul>
+<li><p>使用 <code>save_state()</code> 将上述所有内容保存到文件夹位置</p>
+</li>
+<li><p>使用 <code>load_state()</code> 加载从早期 <code>save_state</code> 存储的所有内容</p>
+</li>
+</ul>
+<p>您还可以通过 <code>register_for_checkpointing()</code> 方法注册自定义对象来保存它们。 只要对象具有 <code>state_dict</code> 和 <code>load_state_dict</code> 功能并且已注册检查点，HuggingFace Accelerate 就可以使用上述两种方法保存和加载任何对象。<br>这是一个在训练期间使用检查点保存和重新加载状态的示例（从 HuggingFace Accelerate 文档获取和修改）</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">from</span> accelerate <span class="hljs-keyword">import</span> Accelerator
+<span class="hljs-keyword">import</span> torch
+
+accelerator = Accelerator()
+
+my_scheduler = torch.optim.lr_scheduler.StepLR(my_optimizer, step_size=<span class="hljs-number">1</span>, gamma=<span class="hljs-number">0.99</span>)
+my_model, my_optimizer, my_training_dataloader = accelerate.prepare(my_model, my_optimizer, my_training_dataloader)
+
+<span class="hljs-comment"># Register the LR scheduler</span>
+accelerate.register_for_checkpointing(my_scheduler)
+
+<span class="hljs-comment"># Save the starting state</span>
+accelerate.save_state(<span class="hljs-string">&quot;my/save/path&quot;</span>)
+
+<span class="hljs-comment"># Perform training</span>
+<span class="hljs-comment"># training loop here ...</span>
+
+<span class="hljs-comment"># Restore previous state</span>
+accelerate.load_state(<span class="hljs-string">&quot;my/save/path&quot;</span>)</code></pre></div>
+
+<h2 id="记录"><a href="#记录" class="headerlink" title="记录"></a>记录</h2><p>HuggingFace Accelerate 有自己的日志记录实用程序来处理分布式系统中的日志记录。 您应该使用 Accelerate 的日志记录实用程序替换标准 Python 日志记录模块。 这是一个简短的例子：</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">from</span> accelerate.logging <span class="hljs-keyword">import</span> get_logger
+
+logger = get_logger(__name__)
+
+<span class="hljs-comment"># logs on all processes</span>
+logger.info(<span class="hljs-string">&quot;My log&quot;</span>, main_process_only=<span class="hljs-literal">False</span>)
+<span class="hljs-comment"># logs only on main process</span>
+logger.debug(<span class="hljs-string">&quot;My log&quot;</span>, main_process_only=<span class="hljs-literal">True</span>)
+</code></pre></div>
+
+<h2 id="使用Weights-Biases进行实验跟踪"><a href="#使用Weights-Biases进行实验跟踪" class="headerlink" title="使用Weights &amp; Biases进行实验跟踪"></a>使用Weights &amp; Biases进行实验跟踪</h2><p>在分布式设置中使用实验跟踪器可能有点复杂，但 HuggingFace Accelerate 使我们变得相当容易。 要将Weights &amp; Biases与 HuggingFace Accelerate 结合使用，您应该在启动 Accelerator 类时首先将 wandb 传递给 <code>log_with</code> 参数。</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">from</span> accelerate <span class="hljs-keyword">import</span> Accelerator
+accelerator = Accelerator(log_with=<span class="hljs-string">&quot;wandb&quot;</span>)</code></pre></div>
+
+<p>在实验开始时，应使用 <code>Accelerator.init_trackers()</code> 来设置您的项目。 <code>init_trackers()</code> 接受以下参数。</p>
+<ul>
+<li><p>项目名称：项目的名称。 这将被传递到后台的 wandb.init() 项目参数中。</p>
+</li>
+<li><p>config：要记录的配置。 传递到 wandb.init() 的配置参数中。</p>
+</li>
+<li><p>init_kwargs：要传递给特定跟踪器的 <code>__init__</code> 函数的嵌套 kwargs 字典。 您可以传递 <code>wandb.init()</code> 在此参数中作为键值对的任何其他参数。</p>
+</li>
+</ul>
+<p>以下是如何使用 HuggingFace Accelerate 初始化 W&amp;B 运行的示例。</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">from</span> accelerate <span class="hljs-keyword">import</span> Accelerator
+
+accelerator = Accelerator()
+hps = &#123;<span class="hljs-string">&quot;num_epochs&quot;</span>: <span class="hljs-number">5</span>, <span class="hljs-string">&quot;learning_rate&quot;</span>: <span class="hljs-number">1e-4</span>, <span class="hljs-string">&quot;batch_size&quot;</span>: <span class="hljs-number">16</span>&#125;
+accelerator.init_trackers(
+    <span class="hljs-string">&quot;my_project&quot;</span>,
+    config=hps,
+    init_kwargs=&#123;
+        <span class="hljs-string">&quot;wandb&quot;</span>: &#123;
+            <span class="hljs-string">&quot;notes&quot;</span>: <span class="hljs-string">&quot;testing accelerate pipeline&quot;</span>,
+            <span class="hljs-string">&quot;tags&quot;</span>: [<span class="hljs-string">&quot;tag_a&quot;</span>, <span class="hljs-string">&quot;tag_b&quot;</span>],
+            <span class="hljs-string">&quot;entity&quot;</span>: <span class="hljs-string">&quot;gladiator&quot;</span>,
+        &#125;
+    &#125;,
+)</code></pre></div>
+
+<p>初始化 W&amp;B 跟踪后，您现在可以使用 Accelerate 的 <code>log()</code> 方法记录任何数据，就像之前使用 <code>wandb.log()</code> 所做的那样。 您还可以传递当前step编号，将记录的数据与训练循环中的特定步骤相关联。</p>
+<div class="code-wrapper"><pre><code class="hljs python">accelerator.log(&#123;<span class="hljs-string">&quot;train_loss&quot;</span>: <span class="hljs-number">1.12</span>, <span class="hljs-string">&quot;valid_loss&quot;</span>: <span class="hljs-number">0.8</span>&#125;, step=<span class="hljs-number">1</span>)</code></pre></div>
+
+<p>完成训练后，请确保运行 <code>Accelerator.end_training()</code>，以便所有跟踪器都可以运行其完成功能（如果有）。 这类似于调用 <code>wandb.finish()</code> 来完成运行并上传所有数据。</p>
+<div class="code-wrapper"><pre><code class="hljs python">accelerator.end_training()</code></pre></div>
+
+<p>如果您想了解 HuggingFace Accelerate 在幕后的作用，可以查看WandBTracker 类。</p>
+<h2 id="启动分布式代码"><a href="#启动分布式代码" class="headerlink" title="启动分布式代码"></a>启动分布式代码</h2><p>现在您已经了解了如何使用 HuggingFace Accelerate 来训练分布式设置，现在是时候启动我们已调整用于训练分布式设置的实际代码了。 第一步是将所有代码包装到 main() 函数中。</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">from</span> accelerate <span class="hljs-keyword">import</span> Accelerator
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">main</span>():
+    accelerator = Accelerator()
+
+    model, optimizer, training_dataloader, scheduler = accelerator.prepare(
+        model, optimizer, training_dataloader, scheduler
+    )
+
+
+    <span class="hljs-keyword">for</span> batch <span class="hljs-keyword">in</span> training_dataloader:
+        optimizer.zero_grad()
+        inputs, targets = batch
+        outputs = model(inputs)
+        loss = loss_function(outputs, targets)
+        accelerator.backward(loss)
+        optimizer.step()
+        scheduler.step()
+
+
+<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:
+    main()
+</code></pre></div>
+
+<p>您也可以将其他中间函数包装在主函数中：</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">main</span>():
+   function_which_does_data_processing()
+   function_which_does_training()
+   function_which_does_evaluation()
+
+
+<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:
+    main()</code></pre></div>
+
+<p>接下来，您需要通过 <code>accelerate launch</code> 来启动它。</p>
+<blockquote>
+<p>建议您在使用加速启动之前运行accelerate config来根据您的喜好配置环境。 否则，🤗 Accelerate 将根据您的系统设置使用非常基本的默认值。</p>
+</blockquote>
+<p>HuggingFace Accelerate 有一个特殊的 CLI 命令，可帮助您通过加速启动在系统中启动代码。 该命令包含在各种平台上启动脚本所需的所有不同命令，而您不必记住每个命令是什么。<br>您可以使用以下命令快速启动脚本：</p>
+<div class="code-wrapper"><pre><code class="hljs bash">accelerate launch &#123;script_name.py&#125; --arg1 --arg2 ...</code></pre></div>
+
+<p>只需将 <code>accelerate launch</code> 放在命令的开头，然后像平常一样将其他参数传递给脚本即可！</p>
+<p>由于这会运行各种torch生成方法，因此也可以在此处修改所有预期的环境变量。 例如，以下是如何使用单个 GPU 加速启动：</p>
+<div class="code-wrapper"><pre><code class="hljs python">CUDA_VISIBLE_DEVICES=<span class="hljs-string">&quot;0&quot;</span> accelerate launch &#123;script_name.py&#125; --arg1 --arg2 ...</code></pre></div>
+
+
+
+<p>如果你想了解更多，请<a target="_blank" rel="noopener" href="https://wandb.ai/gladiator/HF%20Accelerate%20+%20W&B/reports/Hugging-Face-Accelerate-Super-Charged-With-Weights-Biases--VmlldzoyNzk3MDUx">阅读原文</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="category-chain-item">学习笔记</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/blog/tags/huggingface/" class="print-no-link">#huggingface</a>
+      
+        <a href="/blog/tags/accelerate/" class="print-no-link">#accelerate</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>学习笔记|Huggingface Accelerate</div>
+      <div>https://jiawei804.github.io/blog/2024/01/13/2024/01/13/accelerate/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Zhang Jiawei</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年1月13日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2023/12/31/2023/12/31/last/" title="”今年“（2023）|“今年”（2024）">
+                        <span class="hidden-mobile">”今年“（2023）|“今年”（2024）</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/blog/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/blog/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
