@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://jiawei804.github.io/blog/images/2024/1-18.jpg">
 <meta property="article:published_time" content="2024-01-17T16:00:00.000Z">
-<meta property="article:modified_time" content="2024-01-18T04:56:16.916Z">
+<meta property="article:modified_time" content="2024-01-18T04:59:41.420Z">
 <meta property="article:author" content="Zhang Jiawei">
 <meta property="article:tag" content="fine_tuning">
 <meta name="twitter:card" content="summary_large_image">
@@ -377,14 +377,14 @@
 <p>部分微调是指冻结模型的一部分层的参数不参与梯度更新的过程，这种方式在某些情况下被证明具有比全量微调更大的优势。除了简单的冻结层之外，不同的论文提出了不同的冻结策略，比如只微调偏置bias，或者只对归一化层等进行调整。</p>
 <h2 id="适应性微调（Adapter）"><a href="#适应性微调（Adapter）" class="headerlink" title="适应性微调（Adapter）"></a>适应性微调（Adapter）</h2><p>Adapter最初由论文“Parameter-Efficient Transfer Learning for NLP”提出，策略是在Transformer的模型结构中在注意力层和前馈网络层之后加入两层全连接层和非线性激活函数，被称之为Adapter，第一层将d维向量映射到m维向量，第二层将m维向量映射回d维，以保持后续正确的残差连接，一个Adapter的总参数量为$(dm+m)+(md+d)$.如果你了解Transformer的实现，那么并不难知道Adapter加在哪里。</p>
 <figure>
-    <img src=微调1.jpg" alt="DGL" style="width:90%;">
-    <figcaption>图1: LoRA</figcaption>
+    <img src=微调1.jpg" alt="Adapter" style="width:90%;">
+    <figcaption>图1: Adapter</figcaption>
 </figure>
 
 <p>之后，借鉴Adapter的方法，论文“LORA: LOW-RANK ADAPTATION OF LARGE LANGUAGE MODELS”提出了LoRA低秩自适应微调技术。LoRA的策略是在Transformer的自主力层中，对q、v（注意力层中计算的三个向量分别是q、k、v）加入额外的类似于漏斗的全连接网络，与Adapter相似，第一个全连接层将维度缩小到r，第二个全连接层将维度恢复，之后将计算的q值与LORA相加。更精炼的概括是，LoRA在自注意力子层之间的q和v结果中添加了两个低秩矩阵进行微调。</p>
 <figure>
-    <img src="微调2.jpg" srcset="/blog/img/loading.gif" lazyload alt="DGL" style="width:90%;">
-    <figcaption>图2: Adapter</figcaption>
+    <img src="微调2.jpg" srcset="/blog/img/loading.gif" lazyload alt="LoRA" style="width:90%;">
+    <figcaption>图2: LoRA</figcaption>
 </figure>
 
 <h2 id="提示微调（P-Tuning）"><a href="#提示微调（P-Tuning）" class="headerlink" title="提示微调（P-Tuning）"></a>提示微调（P-Tuning）</h2><p>与P-Tuning相关的工作：</p>
