@@ -16,26 +16,26 @@
   <meta name="author" content="Zhang Jiawei">
   <meta name="keywords" content="">
   
-    <meta name="description" content="学习笔记|大模型微调方法最近在看一些模型微调的相关方法，阅读了不少论文，想做个小结，分享给需要的朋友。 直接微调直接微调是指在不改变模型结构的基础上 ，加载预训练模型并在有限的数据集上微调训练，通常选取更小的学习率，通常的一些技术有全量微调，冻结部分参数等。  全量微调  全量微调是指每次更新模型的全部参数，这种方式在已有预训练权重的基础上进行，训练和预训练一样，但是由于预训练模型已经学习到了一定">
+    <meta name="description" content="全排列|Leetcode心得  leetcode46：给定一个不含重复数字的数组 nums ，返回其所有可能的全排列 。你可以 按任意顺序 返回答案。  看到这道题第一个想法是数据结构学的使用辅助数组visited来递归搜索，当visited都为1（全被访问）就是一个全排列 class Solution:     def permute(self, nums: List[int]) -&gt; L">
 <meta property="og:type" content="article">
-<meta property="og:title" content="学习笔记|大模型微调方法">
-<meta property="og:url" content="https://jiawei804.github.io/blog/2024/01/18/2024/01/18/weitiao/index.html">
+<meta property="og:title" content="全排列|Leetcode心得">
+<meta property="og:url" content="https://jiawei804.github.io/blog/2024/01/20/2024/01/20/%E5%85%A8%E6%8E%92%E5%88%97/index.html">
 <meta property="og:site_name" content="Jiawei&#39;s Blog">
-<meta property="og:description" content="学习笔记|大模型微调方法最近在看一些模型微调的相关方法，阅读了不少论文，想做个小结，分享给需要的朋友。 直接微调直接微调是指在不改变模型结构的基础上 ，加载预训练模型并在有限的数据集上微调训练，通常选取更小的学习率，通常的一些技术有全量微调，冻结部分参数等。  全量微调  全量微调是指每次更新模型的全部参数，这种方式在已有预训练权重的基础上进行，训练和预训练一样，但是由于预训练模型已经学习到了一定">
+<meta property="og:description" content="全排列|Leetcode心得  leetcode46：给定一个不含重复数字的数组 nums ，返回其所有可能的全排列 。你可以 按任意顺序 返回答案。  看到这道题第一个想法是数据结构学的使用辅助数组visited来递归搜索，当visited都为1（全被访问）就是一个全排列 class Solution:     def permute(self, nums: List[int]) -&gt; L">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://jiawei804.github.io/blog/images/2024/1-18.jpg">
-<meta property="article:published_time" content="2024-01-17T16:00:00.000Z">
-<meta property="article:modified_time" content="2024-01-18T05:01:09.488Z">
+<meta property="og:image" content="https://jiawei804.github.io/blog/images/2024/1-20.jpg">
+<meta property="article:published_time" content="2024-01-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-01-20T14:28:49.354Z">
 <meta property="article:author" content="Zhang Jiawei">
-<meta property="article:tag" content="fine_tuning">
+<meta property="article:tag" content="thoughts">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://jiawei804.github.io/blog/images/2024/1-18.jpg">
+<meta name="twitter:image" content="https://jiawei804.github.io/blog/images/2024/1-20.jpg">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
   
   
-  <title>学习笔记|大模型微调方法 - Jiawei&#39;s Blog</title>
+  <title>全排列|Leetcode心得 - Jiawei&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -283,13 +283,13 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('/blog/images/2024/1-18-cover.jpg') no-repeat center center; background-size: cover;">
+     style="background: url('/blog/images/2024/1-20-cover.jpg') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="学习笔记|大模型微调方法"></span>
+            <span id="subtitle" data-typed-text="全排列|Leetcode心得"></span>
           
         </div>
 
@@ -300,8 +300,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-01-18 00:00" pubdate>
-          2024年1月18日 凌晨
+        <time datetime="2024-01-20 00:00" pubdate>
+          2024年1月20日 凌晨
         </time>
       </span>
     
@@ -312,7 +312,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          715 字
+          416 字
         
       </span>
     
@@ -323,7 +323,7 @@
         
         
         
-          6 分钟
+          4 分钟
         
       </span>
     
@@ -360,44 +360,92 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">学习笔记|大模型微调方法</h1>
+            <h1 id="seo-header">全排列|Leetcode心得</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="学习笔记-大模型微调方法"><a href="#学习笔记-大模型微调方法" class="headerlink" title="学习笔记|大模型微调方法"></a>学习笔记|大模型微调方法</h1><p>最近在看一些模型微调的相关方法，阅读了不少论文，想做个小结，分享给需要的朋友。</p>
-<h2 id="直接微调"><a href="#直接微调" class="headerlink" title="直接微调"></a>直接微调</h2><p>直接微调是指在不改变模型结构的基础上 ，加载预训练模型并在有限的数据集上微调训练，通常选取更小的学习率，通常的一些技术有全量微调，冻结部分参数等。</p>
-<ul>
-<li>全量微调</li>
-</ul>
-<p>全量微调是指每次更新模型的全部参数，这种方式在已有预训练权重的基础上进行，训练和预训练一样，但是由于预训练模型已经学习到了一定的先验知识，所以会降低微调的训练成本，模型可以更快地收敛。</p>
-<ul>
-<li>部分微调（冻结）</li>
-</ul>
-<p>部分微调是指冻结模型的一部分层的参数不参与梯度更新的过程，这种方式在某些情况下被证明具有比全量微调更大的优势。除了简单的冻结层之外，不同的论文提出了不同的冻结策略，比如只微调偏置bias，或者只对归一化层等进行调整。</p>
-<h2 id="适应性微调（Adapter）"><a href="#适应性微调（Adapter）" class="headerlink" title="适应性微调（Adapter）"></a>适应性微调（Adapter）</h2><p>Adapter最初由论文“Parameter-Efficient Transfer Learning for NLP”提出，策略是在Transformer的模型结构中在注意力层和前馈网络层之后加入两层全连接层和非线性激活函数，被称之为Adapter，第一层将d维向量映射到m维向量，第二层将m维向量映射回d维，以保持后续正确的残差连接，一个Adapter的总参数量为$(dm+m)+(md+d)$.如果你了解Transformer的实现，那么并不难知道Adapter加在哪里。</p>
-<figure>
-    <img src="微调1.jpg" srcset="/blog/img/loading.gif" lazyload alt="Adapter" style="width:90%;">
-    <figcaption>图1: Adapter</figcaption>
-</figure>
+                <h1 id="全排列-Leetcode心得"><a href="#全排列-Leetcode心得" class="headerlink" title="全排列|Leetcode心得"></a>全排列|Leetcode心得</h1><blockquote>
+<p> leetcode46：给定一个不含重复数字的数组 <code>nums</code> ，返回其所有可能的全排列 。你可以 <strong>按任意顺序</strong> 返回答案。</p>
+</blockquote>
+<p>看到这道题第一个想法是数据结构学的使用辅助数组visited来递归搜索，当visited都为1（全被访问）就是一个全排列</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span>:
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">permute</span>(<span class="hljs-params">self, nums: <span class="hljs-type">List</span>[<span class="hljs-built_in">int</span>]</span>) -&gt; <span class="hljs-type">List</span>[<span class="hljs-type">List</span>[<span class="hljs-built_in">int</span>]]:
+        <span class="hljs-keyword">def</span> <span class="hljs-title function_">backtrack</span>(<span class="hljs-params">res, nums, visited</span>):
+            <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(res) == <span class="hljs-built_in">len</span>(nums):
+                result.append(res.copy())
+                <span class="hljs-keyword">return</span>
 
-<p>之后，借鉴Adapter的方法，论文“LORA: LOW-RANK ADAPTATION OF LARGE LANGUAGE MODELS”提出了LoRA低秩自适应微调技术。LoRA的策略是在Transformer的自主力层中，对q、v（注意力层中计算的三个向量分别是q、k、v）加入额外的类似于漏斗的全连接网络，与Adapter相似，第一个全连接层将维度缩小到r，第二个全连接层将维度恢复，之后将计算的q值与LORA相加。更精炼的概括是，LoRA在自注意力子层之间的q和v结果中添加了两个低秩矩阵进行微调。</p>
-<figure>
-    <img src="微调2.jpg" srcset="/blog/img/loading.gif" lazyload alt="LoRA" style="width:90%;">
-    <figcaption>图2: LoRA</figcaption>
-</figure>
+            <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(nums)):
+                <span class="hljs-keyword">if</span> visited[i]:
+                    <span class="hljs-keyword">continue</span>
+                res.append(nums[i])
+                visited[i] = <span class="hljs-number">1</span>
+                backtrack(res, nums, visited)
+                res.pop()
+                visited[i] = <span class="hljs-number">0</span>
 
-<h2 id="提示微调（P-Tuning）"><a href="#提示微调（P-Tuning）" class="headerlink" title="提示微调（P-Tuning）"></a>提示微调（P-Tuning）</h2><p>与P-Tuning相关的工作：</p>
-<ul>
-<li><p>论文 “The Power of Scale for Parameter-Efficient Prompt Tuning”，Prompt Tuning的首创。</p>
-</li>
-<li><p>论文 ”Li and Liang, “Prefix-Tuning: Optimizing Continuous Prompts for Generation”，提出前缀调整Prefix-Tuning。</p>
-</li>
-<li><p>论文“P-Tuning v2: Prompt Tuning Can Be Comparable to Fine-tuning Universally Across Scales and Tasks”在二者之上改进提出了P-Tuning v2。</p>
-</li>
-</ul>
-<p>当然工作并不止这些，相关内容参考<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/464876160">知乎专栏</a></p>
-<p>以上是目前主流的三大类微调方法，每种类别下又有这各式各样不同的小设计，尽管很多方法最先出自NLP领域，但随着技术的不断发展，CV与NLP领域的交叉融合趋势不断演进，典型代表是ViT模型。一起期待未来更多高效的微调方法的出现。</p>
+        result = []
+        visited = [<span class="hljs-number">0</span>] * <span class="hljs-built_in">len</span>(nums)
+        backtrack([], nums, visited)
+        <span class="hljs-keyword">return</span> result</code></pre></div>
+
+
+
+<blockquote>
+<p>就地搜索，bactrack传入两个参数,一个是起始位置，一个是列表的长度。<br>在每一个调用的bactrack中，循环只做一件事，那就是改变start位置的元素（通过交换实现）<br>而递归出口便是start到达最后一个元素，即start&#x3D;end时，形成一个全排列。<br>如此，简单明了，一目了然。</p>
+</blockquote>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span>:
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">permute</span>(<span class="hljs-params">self, nums: <span class="hljs-type">List</span>[<span class="hljs-built_in">int</span>]</span>) -&gt; <span class="hljs-type">List</span>[<span class="hljs-type">List</span>[<span class="hljs-built_in">int</span>]]:
+        <span class="hljs-keyword">def</span> <span class="hljs-title function_">backtrack</span>(<span class="hljs-params">start, end</span>):
+            <span class="hljs-keyword">if</span> start == end - <span class="hljs-number">1</span>:
+                result.append(nums[:])
+
+            <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(start, end):
+
+                nums[start], nums[i] = nums[i], nums[start]
+                backtrack(start+<span class="hljs-number">1</span>, end)
+                nums[i], nums[start] = nums[start], nums[i]
+
+        result = []
+        backtrack(<span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(nums))
+        <span class="hljs-keyword">return</span> result</code></pre></div>
+
+
+
+<blockquote>
+<p> leetcode47：给定一个可包含重复数字的序列 <code>nums</code> ，<em><strong>按任意顺序</strong></em> 返回所有不重复的全排列。</p>
+</blockquote>
+<blockquote>
+<p>就地搜索，bactrack传入两个参数,一个是起始位置，一个是列表的长度。<br>在每次调用bactrack中，循环只做一件事，那就是改变start位置的元素（通过交换实现），交换过的元素会被记录到集合seen中，如果发现后续的元素已经在seen中出现，那么跳过本次循环不发生元素交换。<br>而递归出口便是start到达最后一个元素，即start&#x3D;end时，形成一个全排列。<br>如此，简单明了，一目了然。</p>
+</blockquote>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span>:
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">permuteUnique</span>(<span class="hljs-params">self, nums: <span class="hljs-type">List</span>[<span class="hljs-built_in">int</span>]</span>) -&gt; <span class="hljs-type">List</span>[<span class="hljs-type">List</span>[<span class="hljs-built_in">int</span>]]:
+        <span class="hljs-keyword">def</span> <span class="hljs-title function_">backtrack</span>(<span class="hljs-params">start, end</span>):
+            <span class="hljs-keyword">if</span> start == end - <span class="hljs-number">1</span>:
+                result.append(nums[:])
+
+            seen = <span class="hljs-built_in">set</span>()
+            <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(start, end):
+                <span class="hljs-keyword">if</span> nums[i] <span class="hljs-keyword">in</span> seen:
+                    <span class="hljs-keyword">continue</span>
+
+                seen.add(nums[i])
+                nums[start], nums[i] = nums[i], nums[start]
+                backtrack(start+<span class="hljs-number">1</span>, end)
+                nums[i], nums[start] = nums[start], nums[i]
+
+
+
+        result = []
+        backtrack(<span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(nums))
+        <span class="hljs-keyword">return</span> result</code></pre></div>
+
+
+
+<h2 id="总结全排列两种情况"><a href="#总结全排列两种情况" class="headerlink" title="总结全排列两种情况"></a>总结全排列两种情况</h2><blockquote>
+<p>对于无重复元素的数列来说，每个位置上元素都可能出现一次，但是对于重复元素的数列来说，每个位置只能出现一次相同的元素，这样就可以保证结果不会出现重复的排列。</p>
+</blockquote>
 
                 
               </div>
@@ -416,8 +464,15 @@
     
       <span class="category-chain">
         
-  <a href="/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="category-chain-item">学习笔记</a>
+  <a href="/blog/categories/%E6%B2%89%E6%80%9D%E5%BD%95/" class="category-chain-item">沉思录</a>
   
+  
+    <span>></span>
+    
+  <a href="/blog/categories/%E6%B2%89%E6%80%9D%E5%BD%95/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="category-chain-item">学习笔记</a>
+  
+  
+
   
 
       </span>
@@ -431,7 +486,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/blog/tags/fine-tuning/" class="print-no-link">#fine_tuning</a>
+        <a href="/blog/tags/thoughts/" class="print-no-link">#thoughts</a>
       
     </div>
   
@@ -443,8 +498,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>学习笔记|大模型微调方法</div>
-      <div>https://jiawei804.github.io/blog/2024/01/18/2024/01/18/weitiao/</div>
+      <div>全排列|Leetcode心得</div>
+      <div>https://jiawei804.github.io/blog/2024/01/20/2024/01/20/全排列/</div>
     </div>
     <div class="license-meta">
       
@@ -456,7 +511,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年1月18日</div>
+          <div>2024年1月20日</div>
         </div>
       
       
@@ -488,18 +543,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/blog/2024/01/20/2024/01/20/%E5%85%A8%E6%8E%92%E5%88%97/" title="全排列|Leetcode心得">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">全排列|Leetcode心得</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/blog/2024/01/13/2024/01/13/accelerate/" title="学习笔记|Huggingface Accelerate">
-                        <span class="hidden-mobile">学习笔记|Huggingface Accelerate</span>
+                      <a href="/blog/2024/01/18/2024/01/18/weitiao/" title="学习笔记|大模型微调方法">
+                        <span class="hidden-mobile">学习笔记|大模型微调方法</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
